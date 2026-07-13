@@ -1,0 +1,9 @@
+# Core agent loop + eval harness have NO third-party dependencies.
+# They run on stock Python 3.9+ (Linux/CI/Mac) using the MockBackend.
+
+# Real on-device / on-Mac inference (Apple Silicon only):
+#   pip install mlx-lm
+# mlx-lm is intentionally NOT pinned here so `pip install -r requirements.txt`
+# stays installable on Linux. Install it separately on a Mac:
+#
+#   pip install "mlx-lm>=0.19"

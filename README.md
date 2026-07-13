@@ -8,9 +8,19 @@ The goal is *not* to build a general-purpose chatbot. It is to build a compact m
 runtime whose one job is **agentic device control**: understand a user request, plan,
 call tools, and take real actions on the device — entirely on-device, private, and offline.
 
-> **Status: design phase.** This repository currently contains architecture and planning
-> documents only. No production code has been written yet. See the documents below,
-> review them, and we iterate before building.
+> **Status: Phase 1 in progress.** The design is documented (below) and the **agent core +
+> evaluation harness** are implemented and passing in [`python/`](python/) — runnable now with
+> no GPU. The Swift/MLX on-device app (Phase 2+) is next. See the roadmap.
+
+## Try it now (no GPU, no model)
+```bash
+cd python
+python -m unittest discover -s tests -q   # agent loop / parser / safety gate tests
+python -m eval.runner                      # eval suite: task success + tool-call validity
+python demo.py --yes "remind me to call mom at 6pm"
+```
+On an Apple Silicon Mac, `pip install "mlx-lm>=0.19"` then add `--backend mlx` to run the
+**real** small model. See [`python/README.md`](python/README.md).
 
 ## Documents
 
@@ -19,6 +29,7 @@ call tools, and take real actions on the device — entirely on-device, private,
 | [`docs/design.md`](docs/design.md) | Full architecture: layers, model choices, agent loop, tool system, per-platform control, safety, privacy. |
 | [`docs/roadmap.md`](docs/roadmap.md) | Phased build plan (Phase 0 → 6), milestones, and definition of done for each. |
 | [`docs/decisions.md`](docs/decisions.md) | Decision log (ADRs) capturing the key choices and their trade-offs. |
+| [`python/`](python/) | Runnable agent core + eval harness (Phase 1). |
 
 ## The short version
 

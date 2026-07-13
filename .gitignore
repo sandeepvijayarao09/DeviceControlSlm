@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Models / weights (never commit; downloaded on the Mac)
+*.safetensors
+*.gguf
+models/
+
+# macOS / Xcode (for the future Swift app)
+.DS_Store
+*.xcuserstate
+xcuserdata/
+.build/
+DerivedData/
