@@ -8,13 +8,16 @@ assume one focused developer; treat them as relative, not calendar promises.
 
 ## Phase 0 — Spike & feasibility (~1 week)
 **Goal:** prove an SLM runs on the real target hardware at usable speed.
-- Run the `mlx-swift-examples` LLM demo on a real iPhone/iPad and on a Mac.
-- Load Qwen2.5-1.5B-Instruct (4-bit) on phone, Qwen2.5-3B (4-bit) on Mac.
-- Measure tokens/sec, time-to-first-token, and **peak memory vs. jetsam budget**.
-- In parallel, run the same model under `mlx-lm` (Python) on a dev machine.
+- Run the `mlx-swift-examples` LLM demo **natively on the Mac** (the primary surface — MLX does
+  not run in the iOS/iPadOS Simulator; see design §3.4). Load Qwen2.5-3B (4-bit).
+- Run the same model under `mlx-lm` (Python) on the Mac for the Python dev/eval loop.
+- Confirm the iPhone/iPad **Simulator** builds and runs the demo *UI* with a stub model backend.
+- *(Optional, needs a physical iPhone/iPad)* load Qwen2.5-1.5B (4-bit) on device and measure
+  tokens/sec, time-to-first-token, and **peak memory vs. jetsam budget**. Can be deferred to
+  late Phase 2 if no device is available yet.
 
-**DoD:** documented tokens/sec + peak RAM per device tier; a go/no-go on model sizes; the
-Python and on-device runners produce comparable output for the same prompt.
+**DoD:** documented Mac tokens/sec + peak RAM; a go/no-go on model sizes; the Python and native
+Mac runners produce comparable output for the same prompt; Simulator runs the UI on a stub model.
 
 ---
 
@@ -31,16 +34,20 @@ Python and on-device runners produce comparable output for the same prompt.
 
 ---
 
-## Phase 2 — Swift core + on-device inference + minimal app (~3 weeks)
-**Goal:** the validated agent, running on-device, with a chat UI.
+## Phase 2 — Swift core + native inference + minimal app (~3 weeks)
+**Goal:** the validated agent, running natively on the Mac, with a chat UI.
 - `AgentCore` SwiftPM package: port the loop, tool protocol, registry (shares Phase 1
   prompts/schemas).
-- `MLXRuntime`: wrap `mlx-swift` inference (streaming, KV-cache, device-tiered model load).
+- `MLXRuntime`: wrap `mlx-swift` inference (streaming, KV-cache, device-tiered model load),
+  behind a `ModelBackend` protocol with a **stub backend** for the Simulator.
 - Multiplatform SwiftUI app: streaming chat, model download/management, a "stop" control.
+  Runs full-stack **on the Mac target**; runs UI-only on the iPhone/iPad Simulator via the stub.
 - Wire in the **in-app tools** (adapter family A) so actions are real end-to-end.
 
-**DoD:** on a real device, type a request → agent calls an in-app tool → observable result,
-fully offline; parity with Python on the shared eval tasks that use in-app-equivalent tools.
+**DoD:** on the **Mac**, type a request → agent calls an in-app tool → observable result, fully
+offline with real MLX inference; the iPhone/iPad **Simulator** runs the same UI on the stub
+backend; parity with Python on the shared eval tasks that use in-app-equivalent tools.
+*(Optional: confirm real inference on a physical iPhone/iPad.)*
 
 ---
 
@@ -94,7 +101,9 @@ full eval suite, with no network dependency for inference.
 ---
 
 ## Sequencing notes
-- Phases 0–2 are the critical path to a working demo; 3/4 can be reordered based on whether
-  you want to show iPhone or Mac first (open question #1 in `design.md`).
+- **Mac-first** is the chosen path: because MLX can't run in the Simulator but runs natively on
+  the Mac, the whole agent (inference + Accessibility control) is buildable and demoable on the
+  developer's Mac with no extra hardware. Phase 4 (macOS Accessibility) can therefore land early.
+- Phases 0–2 are the critical path to a working demo.
 - The Python eval harness (Phase 1) is reused through every later phase — it is the
   regression net, not throwaway.

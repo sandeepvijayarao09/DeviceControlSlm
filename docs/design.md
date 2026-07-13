@@ -97,6 +97,29 @@ that won't fit the app's jetsam budget.
   headroom. Done via `mlx_lm.convert`.
 - **Constrained decoding:** the single most important reliability lever (see §5.3).
 
+### 3.4 Development environment & the Simulator constraint
+**MLX does not run in the iOS/iPadOS Simulator.** The Simulator does not expose the modern
+Metal `MTLGPUFamily` MLX requires, so any attempt to run inference there crashes. This is a
+hard limitation, not a bug we can work around.
+
+Consequences for how we build and test:
+
+| Target | MLX inference | UI + agent loop + App Intents | Accessibility control |
+| --- | :---: | :---: | :---: |
+| **Mac (native)** | ✅ real | ✅ | ✅ |
+| iPhone / iPad **Simulator** | ❌ crashes | ✅ | ❌ (sandbox) |
+| iPhone / iPad **physical device** | ✅ real | ✅ | ❌ (sandbox) |
+
+Therefore:
+- The **Mac target is the primary development and demo surface** — the *entire* agent, including
+  real model inference *and* Accessibility control, runs natively on the developer's Mac with no
+  extra hardware.
+- **Simulators are for UI and logic only.** To exercise the iPhone/iPad UI and App Intents flows
+  in the Simulator, the app runs with a **stub/mock model backend** (or an optional dev-only
+  bridge to the Mac's MLX process). This lets us build the whole app without a physical device.
+- Real on-device inference speed and memory on iPhone/iPad are confirmed on a **physical device**
+  in Phase 0 / late Phase 2 — not in the Simulator.
+
 ---
 
 ## 4. Agent orchestration (`AgentCore`)
@@ -274,8 +297,9 @@ prompt/model change.
 ---
 
 ## 10. Open questions for review
-1. Primary device to demo first — iPhone, iPad, or Mac? (Affects model tier and which tool
-   adapter we build first.)
+1. ~~Primary device to demo first~~ — **resolved: Mac-first.** MLX can't run in the iOS/iPadOS
+   Simulator but runs natively on the Mac, so the full agent (inference + Accessibility) is
+   buildable and demoable on the developer's Mac with no extra hardware (see §3.4).
 2. Which concrete tools matter most to you (reminders? messages? Mac app control?) — that
    sets the Phase 3 order.
 3. Are you open to a later LoRA fine-tune to boost tool reliability, or do we stay
