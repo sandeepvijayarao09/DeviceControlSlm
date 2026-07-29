@@ -296,12 +296,14 @@ prompt/model change.
 
 ---
 
-## 10. Open questions for review
-1. ~~Primary device to demo first~~ — **resolved: Mac-first.** MLX can't run in the iOS/iPadOS
-   Simulator but runs natively on the Mac, so the full agent (inference + Accessibility) is
-   buildable and demoable on the developer's Mac with no extra hardware (see §3.4).
-2. Which concrete tools matter most to you (reminders? messages? Mac app control?) — that
-   sets the Phase 3 order.
-3. Are you open to a later LoRA fine-tune to boost tool reliability, or do we stay
-   prompt-only?
-4. Distribution target: App Store, TestFlight, or direct/notarized (matters most on macOS)?
+## 10. Decisions (resolved)
+All previously open questions are now decided — defaulting to Apple's conventions.
+1. **Demo device:** **Mac-first.** MLX can't run in the iOS/iPadOS Simulator but runs natively
+   on the Mac, so the full agent (inference + Accessibility) is buildable and demoable on the
+   developer's Mac with no extra hardware (§3.4).
+2. **Tool set / order:** in-app → EventKit (Reminders/Calendar) → timers & open-app → Messages/
+   Mail compose → Shortcuts → macOS Accessibility (ADR-0008).
+3. **Model adaptation:** prompt-only first; LoRA only if eval plateaus below target (ADR-0004).
+4. **Distribution:** TestFlight → App Store; Developer ID–notarized fallback for macOS (ADR-0009).
+5. **App conventions:** SwiftUI + Swift Package Manager + App Intents, HIG-compliant, Privacy
+   Manifest, min iOS/iPadOS 17 / macOS 14 (ADR-0007).
