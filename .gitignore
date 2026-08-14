@@ -11,6 +11,13 @@ venv/
 *.gguf
 models/
 
+# Fine-tuning: adapters/fused weights (large, machine-specific) and the full
+# generated dataset (regenerate deterministically with `make ft-data`).
+finetune/adapters/
+finetune/fused/
+finetune/data/train.jsonl
+finetune/data/valid.jsonl
+
 # macOS / Xcode (for the future Swift app)
 .DS_Store
 *.xcuserstate

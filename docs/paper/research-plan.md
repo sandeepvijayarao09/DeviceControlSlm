@@ -87,9 +87,27 @@ upper bound* only. Model identity pinned by **HF revision hash**.
   plugged in, 3 warm-up runs, report median of ≥5.
 - **iPhone/iPad (future work / add-on):** on-device via Swift `MLXRuntime`; same task set.
 
-## 8. Ablations
+## 8. Building our SLM (fine-tuning, M5)
+We do not pretrain; we **specialize** an open Apache-2.0 base via **LoRA** for structured device
+control, targeting the baseline's measured failures (compositional collapse; acting instead of
+asking). Pipeline in `finetune/`:
+- **Data** (`gen_data.py`, no GPU): synthetic SFT trajectories in MLX chat format, using the
+  *same* prompt/tool formatting as inference (no train/inference skew), with gold trajectories
+  **rolled out through the sandbox** so multi-step examples teach act→observe→act→finish.
+  **Contamination-controlled** against every benchmark prompt/paraphrase. ~2.4k examples,
+  ~49% compositional / 27% single·read·comms / 14% refuse / 10% clarify; every gold action turn
+  is verified to parse + validate.
+- **Train/compare** (`train_and_eval.sh`, Apple Silicon): LoRA-fine-tune and fuse three
+  candidate bases (Qwen2.5-0.5B, Qwen2.5-1.5B, SmolLM2-1.7B), reporting **BEFORE vs AFTER**
+  benchmark metrics per base; the benchmark picks the winner (best TSR at acceptable
+  size/latency), which becomes the shipped SLM.
+- **Guarantee preserved:** the confirmation gate is a runtime property, so **UER stays 0**
+  regardless of what the fine-tune changes.
+
+## 9. Ablations
 Constrained decoding on/off · repair-retry on/off · few-shot (0/2/4-shot) · prompt variants ·
-tool-catalog size (does exposing only relevant tools help small models?).
+tool-catalog size · **fine-tuned vs base** (headline) · data-mixture ablation (does upweighting
+compositional trajectories drive the compositional gain?).
 
 ## 9. Threats to validity
 Benchmark realism (mitigated: tools mirror real Apple APIs; state checkers, not string match) ·

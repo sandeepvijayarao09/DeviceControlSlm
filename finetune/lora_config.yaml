@@ -1,0 +1,30 @@
+# MLX-LM LoRA config for the device-control SFT (run on Apple Silicon).
+# Override `model` / `adapter_path` per base in train_and_eval.sh.
+# Docs: https://github.com/ml-explore/mlx-lm  (mlx_lm.lora)
+
+model: "mlx-community/Qwen2.5-1.5B-Instruct-4bit"   # overridden per base
+train: true
+data: "finetune/data"          # expects train.jsonl / valid.jsonl (chat format)
+adapter_path: "finetune/adapters/qwen2.5-1.5b"
+
+# Optimization
+fine_tune_type: lora
+iters: 800
+batch_size: 4
+num_layers: 16                 # LoRA on the top N transformer blocks
+learning_rate: 1.0e-4
+max_seq_length: 2048
+grad_checkpoint: true
+
+# Reporting / eval / checkpoints
+steps_per_report: 25
+steps_per_eval: 100
+val_batches: 20
+save_every: 200
+seed: 0
+
+# LoRA hyperparameters
+lora_parameters:
+  rank: 16
+  scale: 20.0
+  dropout: 0.05
