@@ -8,28 +8,32 @@ The goal is *not* to build a general-purpose chatbot. It is to build a compact m
 runtime whose one job is **agentic device control**: understand a user request, plan,
 call tools, and take real actions on the device — entirely on-device, private, and offline.
 
-> **Status: Phase 1 in progress.** The design is documented (below) and the **agent core +
-> evaluation harness** are implemented and passing in [`python/`](python/) — runnable now with
-> no GPU. The Swift/MLX on-device app (Phase 2+) is next. See the roadmap.
+> **Status: building toward a conference paper** (benchmark + system). Implemented and passing:
+> the portable **agent core** ([`python/`](python/)), **DeviceControlBench** — an executable
+> benchmark ([`bench/`](bench/)), and a **publication-grade eval harness** with real metrics,
+> bootstrap CIs, and reproducible run manifests. Real model numbers land in [`results/`](results/).
+> The Swift/MLX on-device app and the Apple-Silicon efficiency study are next.
 
 ## Try it now (no GPU, no model)
 ```bash
-cd python
-python -m unittest discover -s tests -q   # agent loop / parser / safety gate tests
-python -m eval.runner                      # eval suite: task success + tool-call validity
-python demo.py --yes "remind me to call mom at 6pm"
+make gold                                    # validate benchmark integrity (48/48 tasks)
+make test                                    # agent-core + benchmark unit tests
+make eval MODEL=Qwen/Qwen2.5-1.5B-Instruct   # run a REAL model over the benchmark (CPU/GPU)
+make summarize                               # aggregate results/ -> leaderboard
 ```
-On an Apple Silicon Mac, `pip install "mlx-lm>=0.19"` then add `--backend mlx` to run the
-**real** small model. See [`python/README.md`](python/README.md).
+On an Apple Silicon Mac, `pip install mlx-lm` then `make eval-mlx MODEL=...` for the real
+on-device model plus latency/memory/energy numbers.
 
 ## Documents
 
 | Doc | What it covers |
 | --- | --- |
-| [`docs/design.md`](docs/design.md) | Full architecture: layers, model choices, agent loop, tool system, per-platform control, safety, privacy. |
-| [`docs/roadmap.md`](docs/roadmap.md) | Phased build plan (Phase 0 → 6), milestones, and definition of done for each. |
-| [`docs/decisions.md`](docs/decisions.md) | Decision log (ADRs) capturing the key choices and their trade-offs. |
-| [`python/`](python/) | Runnable agent core + eval harness (Phase 1). |
+| [`docs/paper/research-plan.md`](docs/paper/research-plan.md) | The paper: contributions, research questions, statistical protocol, model sweep, ablations, threats to validity. |
+| [`docs/paper/benchmark-design.md`](docs/paper/benchmark-design.md) | DeviceControlBench spec + datasheet. |
+| [`docs/paper/eval-protocol.md`](docs/paper/eval-protocol.md) | Precise metric & statistics definitions. |
+| [`docs/design.md`](docs/design.md) | System architecture: layers, model choices, agent loop, tool system, per-platform control, safety, privacy. |
+| [`docs/roadmap.md`](docs/roadmap.md) · [`docs/decisions.md`](docs/decisions.md) | Phased build plan and decision log (ADRs). |
+| [`bench/`](bench/) · [`python/`](python/) | The benchmark + eval harness, and the agent core. |
 
 ## The short version
 
