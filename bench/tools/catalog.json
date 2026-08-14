@@ -1,0 +1,150 @@
+{
+  "version": "0.1.0",
+  "note": "Canonical device-control tools. Each maps to a real Apple capability. sensitivity: safe|confirm|blocked (ADR-0005). This catalog is the single source of truth shared by the benchmark sandbox and the shipped runtime.",
+  "tools": [
+    {
+      "name": "create_reminder",
+      "apple_binding": "EventKit (EKReminder)",
+      "description": "Create a reminder with text and an optional time.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string", "description": "What to be reminded about."},
+          "time": {"type": "string", "description": "Time of day, e.g. '18:00' or '6pm'. Optional."}
+        },
+        "required": ["text"]
+      }
+    },
+    {
+      "name": "list_reminders",
+      "apple_binding": "EventKit (EKReminder query)",
+      "description": "List existing reminders.",
+      "sensitivity": "safe",
+      "parameters": {"type": "object", "properties": {}}
+    },
+    {
+      "name": "delete_reminder",
+      "apple_binding": "EventKit (EKReminder remove)",
+      "description": "Delete a reminder whose text matches.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {"text": {"type": "string"}},
+        "required": ["text"]
+      }
+    },
+    {
+      "name": "start_timer",
+      "apple_binding": "App Intents (Clock) / user Shortcut",
+      "description": "Start a countdown timer for a number of minutes.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "minutes": {"type": "integer", "description": "Duration in minutes."},
+          "label": {"type": "string"}
+        },
+        "required": ["minutes"]
+      }
+    },
+    {
+      "name": "create_calendar_event",
+      "apple_binding": "EventKit (EKEvent)",
+      "description": "Create a calendar event with a title, start time, and optional end time.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "start": {"type": "string", "description": "Start time, e.g. '15:00'."},
+          "end": {"type": "string"}
+        },
+        "required": ["title", "start"]
+      }
+    },
+    {
+      "name": "list_calendar_events",
+      "apple_binding": "EventKit (EKEvent query)",
+      "description": "List calendar events, optionally for a given day.",
+      "sensitivity": "safe",
+      "parameters": {
+        "type": "object",
+        "properties": {"day": {"type": "string"}}
+      }
+    },
+    {
+      "name": "send_message",
+      "apple_binding": "Messages compose (user presses send)",
+      "description": "Prepare a text message to a contact. Requires user confirmation to send.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "to": {"type": "string", "description": "Contact name."},
+          "body": {"type": "string"}
+        },
+        "required": ["to", "body"]
+      }
+    },
+    {
+      "name": "compose_mail",
+      "apple_binding": "MFMailComposeViewController (user presses send)",
+      "description": "Prepare an email. Requires user confirmation to send.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "to": {"type": "string"},
+          "subject": {"type": "string"},
+          "body": {"type": "string"}
+        },
+        "required": ["to", "body"]
+      }
+    },
+    {
+      "name": "search_notes",
+      "apple_binding": "On-device notes index",
+      "description": "Search the user's notes by keyword and return matches.",
+      "sensitivity": "safe",
+      "parameters": {
+        "type": "object",
+        "properties": {"query": {"type": "string"}},
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "open_app",
+      "apple_binding": "App Intents / URL scheme",
+      "description": "Open an application by name.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {"name": {"type": "string"}},
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "run_shortcut",
+      "apple_binding": "Shortcuts (INIntent)",
+      "description": "Run a user-authored Shortcut by name.",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {"name": {"type": "string"}},
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "set_volume",
+      "apple_binding": "App Intents (system setting)",
+      "description": "Set the output volume to a percentage (0-100).",
+      "sensitivity": "confirm",
+      "parameters": {
+        "type": "object",
+        "properties": {"level": {"type": "integer"}},
+        "required": ["level"]
+      }
+    }
+  ]
+}
