@@ -44,5 +44,7 @@ Quality is backend-invariant at temperature 0 (same weights/quant → same decis
 the latency / throughput / memory / energy measurements the paper reports for on-device use.
 
 ## Status
-Ships the **seed** set (48 tasks, 8 per category, hand-authored, gold-validated). Scaling to
-v1.0 (≥500 tasks, multi-annotator, held-out split) is milestone M6 in the research plan.
+Ships the **seed** set (**64 tasks** of everyday OS-level control, hand-authored,
+gold-validated). The model emits structured commands behind the scenes (no vision); the device
+is idealized/permissive for model evaluation. Scaling to v1.0 (≥500 tasks, multi-annotator,
+held-out split) is milestone M6 in the research plan.

@@ -7,9 +7,19 @@
 
 ## 1. One-sentence thesis
 Small (≤~4B) open language models, running fully on-device on Apple Silicon, can perform
-*agentic device control* — interpret a request, call the right tool with the right arguments,
-and take safe multi-step actions — and we quantify how well, at what latency/memory/energy
-cost, and with what safety guarantees, on a new executable benchmark.
+*agentic device control* — interpret a request and emit the right **structured OS-command**
+with the right arguments, taking safe multi-step actions **behind the scenes** (no screen
+reading / no vision) — and we quantify how well, at what latency/memory/energy cost, and with
+what safety guarantees, on a new executable benchmark.
+
+**Scope (per project direction).** Control is *command-layer*, not screen-driven: the model
+outputs structured system commands (like a command line without a terminal, which iOS/iPadOS
+lack), executed by per-OS adapters — never by analysing screenshots or video. The benchmark
+covers the everyday operations a person does by hand (connectivity, display, audio, power,
+focus, alarms/timers, apps, media) plus user-app actions (reminders/calendar/messages). For
+evaluating the *model*, the device is treated as **idealized/permissive** — every command is
+executable in simulation; real per-OS permission gating (what Apple actually allows a
+third-party app to do) is a separate, later engineering concern, not a property of the model.
 
 ## 2. Why this is publishable (novelty & positioning)
 Existing tool-calling benchmarks are cloud/large-model oriented and not grounded in real,

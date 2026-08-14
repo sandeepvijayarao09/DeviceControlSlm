@@ -24,6 +24,20 @@ def norm_entity(s: str) -> str:
     return norm_text(s)
 
 
+def norm_bool(v) -> bool | None:
+    """Accept true/false, on/off, yes/no, enable/disable, 1/0."""
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return bool(v)
+    t = norm_text(v)
+    if t in ("true", "on", "yes", "enable", "enabled", "1"):
+        return True
+    if t in ("false", "off", "no", "disable", "disabled", "0"):
+        return False
+    return None
+
+
 def norm_duration_minutes(s) -> int | None:
     """'10', '10 minutes', 'ten min', 'an hour', '1.5 hours' -> integer minutes."""
     if isinstance(s, (int, float)):

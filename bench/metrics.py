@@ -8,12 +8,13 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, List
 
-from .normalize import norm_duration_minutes, norm_text, norm_time_24h
+from .normalize import norm_bool, norm_duration_minutes, norm_text, norm_time_24h
 from .runner import TaskRun
 
 _TIME_KEYS = {"time", "start", "end"}
 _DUR_KEYS = {"minutes"}
-_INT_KEYS = {"level"}
+_INT_KEYS = {"level", "brightness", "volume"}
+_BOOL_KEYS = {"enabled"}
 
 
 def normalize_args(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -24,6 +25,8 @@ def normalize_args(args: Dict[str, Any]) -> Dict[str, Any]:
             out[k] = norm_time_24h(v)
         elif k in _DUR_KEYS:
             out[k] = norm_duration_minutes(v)
+        elif k in _BOOL_KEYS:
+            out[k] = norm_bool(v)
         elif k in _INT_KEYS:
             try:
                 out[k] = int(v)

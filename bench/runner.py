@@ -40,13 +40,13 @@ class TaskRun:
 def run_task(task: Dict[str, Any], backend: ModelBackend, max_steps: int = 8,
              gen_config: GenerationConfig | None = None) -> TaskRun:
     state: DeviceState = seed_state(task.get("initial_state"))
-    baseline_side_effects = state.side_effects()
+    baseline_snapshot = state.snapshot()
     registry = ToolRegistry(build_tools(state, subset=task.get("tools")))
     agent = Agent(backend, registry, max_steps=max_steps, confirm=lambda n, a: True,
                   gen_config=gen_config)
     result = agent.run(task["prompt"])
 
-    ok, detail = check(task, state, result, baseline_side_effects=baseline_side_effects)
+    ok, detail = check(task, state, result, baseline_snapshot=baseline_snapshot)
     tool_steps = [s for s in result.steps if s.kind == "tool_call"]
     first_turn_valid = bool(result.steps) and result.steps[0].kind != "error"
 

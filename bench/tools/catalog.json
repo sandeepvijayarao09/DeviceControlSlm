@@ -1,150 +1,97 @@
 {
-  "version": "0.1.0",
-  "note": "Canonical device-control tools. Each maps to a real Apple capability. sensitivity: safe|confirm|blocked (ADR-0005). This catalog is the single source of truth shared by the benchmark sandbox and the shipped runtime.",
+  "version": "0.2.0",
+  "note": "Everyday device-control commands the model emits as STRUCTURED calls (no screen/vision). Covers the common things a person does by hand: settings toggles, display/audio/power, alarms/timers, focus, apps, media, plus user-app actions. The device is treated as idealized/permissive for evaluation; per-OS permission gating is a later concern. sensitivity: safe|confirm|blocked marks genuinely disruptive/outbound actions.",
   "tools": [
-    {
-      "name": "create_reminder",
-      "apple_binding": "EventKit (EKReminder)",
-      "description": "Create a reminder with text and an optional time.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "text": {"type": "string", "description": "What to be reminded about."},
-          "time": {"type": "string", "description": "Time of day, e.g. '18:00' or '6pm'. Optional."}
-        },
-        "required": ["text"]
-      }
-    },
-    {
-      "name": "list_reminders",
-      "apple_binding": "EventKit (EKReminder query)",
-      "description": "List existing reminders.",
-      "sensitivity": "safe",
-      "parameters": {"type": "object", "properties": {}}
-    },
-    {
-      "name": "delete_reminder",
-      "apple_binding": "EventKit (EKReminder remove)",
-      "description": "Delete a reminder whose text matches.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {"text": {"type": "string"}},
-        "required": ["text"]
-      }
-    },
-    {
-      "name": "start_timer",
-      "apple_binding": "App Intents (Clock) / user Shortcut",
-      "description": "Start a countdown timer for a number of minutes.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "minutes": {"type": "integer", "description": "Duration in minutes."},
-          "label": {"type": "string"}
-        },
-        "required": ["minutes"]
-      }
-    },
-    {
-      "name": "create_calendar_event",
-      "apple_binding": "EventKit (EKEvent)",
-      "description": "Create a calendar event with a title, start time, and optional end time.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "title": {"type": "string"},
-          "start": {"type": "string", "description": "Start time, e.g. '15:00'."},
-          "end": {"type": "string"}
-        },
-        "required": ["title", "start"]
-      }
-    },
-    {
-      "name": "list_calendar_events",
-      "apple_binding": "EventKit (EKEvent query)",
-      "description": "List calendar events, optionally for a given day.",
-      "sensitivity": "safe",
-      "parameters": {
-        "type": "object",
-        "properties": {"day": {"type": "string"}}
-      }
-    },
-    {
-      "name": "send_message",
-      "apple_binding": "Messages compose (user presses send)",
-      "description": "Prepare a text message to a contact. Requires user confirmation to send.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "to": {"type": "string", "description": "Contact name."},
-          "body": {"type": "string"}
-        },
-        "required": ["to", "body"]
-      }
-    },
-    {
-      "name": "compose_mail",
-      "apple_binding": "MFMailComposeViewController (user presses send)",
-      "description": "Prepare an email. Requires user confirmation to send.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "to": {"type": "string"},
-          "subject": {"type": "string"},
-          "body": {"type": "string"}
-        },
-        "required": ["to", "body"]
-      }
-    },
-    {
-      "name": "search_notes",
-      "apple_binding": "On-device notes index",
-      "description": "Search the user's notes by keyword and return matches.",
-      "sensitivity": "safe",
-      "parameters": {
-        "type": "object",
-        "properties": {"query": {"type": "string"}},
-        "required": ["query"]
-      }
-    },
-    {
-      "name": "open_app",
-      "apple_binding": "App Intents / URL scheme",
-      "description": "Open an application by name.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {"name": {"type": "string"}},
-        "required": ["name"]
-      }
-    },
-    {
-      "name": "run_shortcut",
-      "apple_binding": "Shortcuts (INIntent)",
-      "description": "Run a user-authored Shortcut by name.",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {"name": {"type": "string"}},
-        "required": ["name"]
-      }
-    },
-    {
-      "name": "set_volume",
-      "apple_binding": "App Intents (system setting)",
-      "description": "Set the output volume to a percentage (0-100).",
-      "sensitivity": "confirm",
-      "parameters": {
-        "type": "object",
-        "properties": {"level": {"type": "integer"}},
-        "required": ["level"]
-      }
-    }
+    {"name": "set_wifi", "domain": "connectivity", "description": "Turn Wi-Fi on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_bluetooth", "domain": "connectivity", "description": "Turn Bluetooth on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_airplane_mode", "domain": "connectivity", "description": "Turn airplane mode on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_cellular_data", "domain": "connectivity", "description": "Turn cellular/mobile data on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_hotspot", "domain": "connectivity", "description": "Turn the personal hotspot on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+
+    {"name": "set_do_not_disturb", "domain": "focus", "description": "Turn Do Not Disturb on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_focus_mode", "domain": "focus", "description": "Set the active Focus mode.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"mode": {"type": "string", "enum": ["work", "personal", "sleep", "driving", "fitness", "off"]}}, "required": ["mode"]}},
+
+    {"name": "set_brightness", "domain": "display", "description": "Set screen brightness to a percentage (0-100).", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"level": {"type": "integer"}}, "required": ["level"]}},
+    {"name": "set_dark_mode", "domain": "display", "description": "Turn Dark Mode on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_auto_lock", "domain": "display", "description": "Set auto-lock timeout in minutes.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"minutes": {"type": "integer"}}, "required": ["minutes"]}},
+    {"name": "set_orientation_lock", "domain": "display", "description": "Turn portrait orientation lock on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_wallpaper", "domain": "display", "description": "Set the wallpaper to a named option.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]}},
+    {"name": "take_screenshot", "domain": "display", "description": "Capture a screenshot.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+
+    {"name": "set_volume", "domain": "audio", "description": "Set output volume to a percentage (0-100).", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"level": {"type": "integer"}}, "required": ["level"]}},
+    {"name": "set_mute", "domain": "audio", "description": "Mute or unmute audio.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_ringer_mode", "domain": "audio", "description": "Set the ringer mode.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"mode": {"type": "string", "enum": ["ring", "vibrate", "silent"]}}, "required": ["mode"]}},
+
+    {"name": "set_low_power_mode", "domain": "power", "description": "Turn Low Power Mode on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "restart_device", "domain": "power", "description": "Restart the device.", "sensitivity": "confirm",
+     "parameters": {"type": "object", "properties": {}}},
+    {"name": "shutdown_device", "domain": "power", "description": "Power off the device.", "sensitivity": "confirm",
+     "parameters": {"type": "object", "properties": {}}},
+
+    {"name": "set_alarm", "domain": "clock", "description": "Set an alarm for a time of day.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"time": {"type": "string"}, "label": {"type": "string"}}, "required": ["time"]}},
+    {"name": "start_timer", "domain": "clock", "description": "Start a countdown timer for a number of minutes.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"minutes": {"type": "integer"}, "label": {"type": "string"}}, "required": ["minutes"]}},
+    {"name": "cancel_timers", "domain": "clock", "description": "Cancel all running timers.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+
+    {"name": "create_reminder", "domain": "productivity", "description": "Create a reminder with text and an optional time.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"text": {"type": "string"}, "time": {"type": "string"}}, "required": ["text"]}},
+    {"name": "list_reminders", "domain": "productivity", "description": "List existing reminders.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+    {"name": "create_calendar_event", "domain": "productivity", "description": "Create a calendar event with a title and start time.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"title": {"type": "string"}, "start": {"type": "string"}, "end": {"type": "string"}}, "required": ["title", "start"]}},
+    {"name": "list_calendar_events", "domain": "productivity", "description": "List calendar events.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"day": {"type": "string"}}}},
+
+    {"name": "send_message", "domain": "comms", "description": "Send a text message to a contact.", "sensitivity": "confirm",
+     "parameters": {"type": "object", "properties": {"to": {"type": "string"}, "body": {"type": "string"}}, "required": ["to", "body"]}},
+    {"name": "compose_mail", "domain": "comms", "description": "Send an email.", "sensitivity": "confirm",
+     "parameters": {"type": "object", "properties": {"to": {"type": "string"}, "subject": {"type": "string"}, "body": {"type": "string"}}, "required": ["to", "body"]}},
+    {"name": "start_call", "domain": "comms", "description": "Place a phone call to a contact.", "sensitivity": "confirm",
+     "parameters": {"type": "object", "properties": {"to": {"type": "string"}}, "required": ["to"]}},
+
+    {"name": "open_app", "domain": "apps", "description": "Open an application by name.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]}},
+    {"name": "close_app", "domain": "apps", "description": "Close an application by name.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]}},
+
+    {"name": "media_control", "domain": "media", "description": "Control media playback.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"action": {"type": "string", "enum": ["play", "pause", "next", "previous", "stop"]}}, "required": ["action"]}},
+    {"name": "play_music", "domain": "media", "description": "Play music, optionally matching a song/artist/playlist.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"query": {"type": "string"}}}},
+
+    {"name": "set_flashlight", "domain": "utility", "description": "Turn the flashlight on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+    {"name": "set_clipboard", "domain": "utility", "description": "Copy text to the clipboard.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}},
+    {"name": "set_location_services", "domain": "utility", "description": "Turn Location Services on or off.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"enabled": {"type": "boolean"}}, "required": ["enabled"]}},
+
+    {"name": "get_battery", "domain": "query", "description": "Get the current battery level.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+    {"name": "get_storage", "domain": "query", "description": "Get free storage space.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+    {"name": "get_connectivity_status", "domain": "query", "description": "Report Wi-Fi/Bluetooth/cellular status.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {}}},
+    {"name": "search_notes", "domain": "query", "description": "Search the user's notes by keyword.", "sensitivity": "safe",
+     "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}
   ]
 }
