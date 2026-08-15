@@ -29,6 +29,29 @@ make ft-data          # -> finetune/data/{train,valid}.jsonl  (~2400 examples)
 Composition (approx): ~49% compositional (multi-step), ~27% single/read/comms, ~14% refuse,
 ~10% clarify. Every gold action turn is verified to parse and validate against the tool schema.
 
+## Two training paths
+| Path | Script | Runs on | Use |
+| --- | --- | --- | --- |
+| **Portable (HF + PEFT)** | `train_hf.py` | any CPU/GPU, any OS | reproducible fine-tune + eval anywhere (incl. CI); no Apple hardware needed |
+| **On-device (MLX)** | `train_and_eval.sh` | Apple Silicon | the shipping path — trains the model we deploy, then measures on-device latency/memory/energy |
+
+Both consume the *same* `finetune/data` and are evaluated by the *same* benchmark, so results
+are comparable. The portable path lets us build and validate the specialized model without a
+Mac; the MLX path produces the quantized on-device artifact.
+
+### Portable path (CPU/GPU, any OS)
+```bash
+pip install torch transformers peft datasets
+python -m finetune.train_hf --model Qwen/Qwen2.5-0.5B-Instruct \
+    --out finetune/merged/qwen0.5b-ft --max-examples 2500 --max-seq-len 1200
+python -m bench.harness --backend hf --model finetune/merged/qwen0.5b-ft --tag ft
+python -m bench.summarize        # base vs ft, side by side
+```
+Each chat example is expanded into per-assistant-turn `(prompt, completion)` pairs with the
+prompt masked, so every decision — including the *later* steps of a compositional trajectory —
+is supervised. `--max-seq-len 1200` fits every example (p99≈1072 tok), so tool definitions are
+never truncated out of the prompt.
+
 ## Train + evaluate (on an Apple Silicon Mac)
 ```bash
 pip install "mlx-lm>=0.19"
