@@ -15,6 +15,7 @@ models/
 # generated dataset (regenerate deterministically with `make ft-data`).
 finetune/adapters/
 finetune/fused/
+finetune/merged/
 finetune/data/train.jsonl
 finetune/data/valid.jsonl
 

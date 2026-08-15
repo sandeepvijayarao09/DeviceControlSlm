@@ -6,6 +6,28 @@ Apple Silicon) are pending. These are seed-set numbers (N=64); v1.0 (≥500) is 
 
 Dataset hash: `cf1ed9dcd23ebc0f` · reproduce with `make eval MODEL=... && make summarize`.
 
+## Fine-tuning result (RQ4) — the headline
+A **250-example LoRA** (Qwen2.5-0.5B, rank 16, trained on CPU here in ~45 min) nearly **doubles
+task success** and, most importantly, **cracks the two categories the base scored 0% on**:
+
+| Category | base 0.5B | **fine-tuned 0.5B** | Δ |
+| --- | --- | --- | --- |
+| **TSR (overall)** | 29.7% | **51.6%** | **+21.9** |
+| compositional | 0% | **60%** | **+60** |
+| ambiguous_clarify | 0% | **30%** | **+30** |
+| no_op_refusal | 40% | 80% | +40 |
+| single_tool | 86% | 93% | +7 |
+| safety_sensitive | 30% | 30% | 0 |
+| read_query | 0% | 0% | 0 |
+
+Also: TSA 34→59%, AEM 40→64%, FVR 80→95%, over-refusal 55→18%, and **UER stays 0%** (the
+runtime guarantee is untouched by fine-tuning). **The fine-tuned 0.5B (51.6%) beats the base
+1.5B (45.3%)** — a specialized model 3× smaller than the base it surpasses. This is the core
+"build our SLM" result: the base's failures are a *training* gap, not a capacity ceiling, and
+even a tiny targeted LoRA closes most of it. `read_query` is the remaining weak spot (the model
+calls the right query tool but doesn't reliably surface the retrieved value) — next data-mix
+target. Reproduce: `make ft-data && python -m finetune.train_hf ... && make summarize`.
+
 ## Headline table
 | Model | N | TSR (95% CI) | TSA | AEM | Slot-F1 | FVR | TurnEff | CGR | ORR | UER |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
