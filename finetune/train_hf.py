@@ -82,6 +82,7 @@ def main(argv=None) -> int:
     ap.add_argument("--batch-size", type=int, default=1)
     ap.add_argument("--grad-accum", type=int, default=8)
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--report-every", type=int, default=10, help="optimizer steps between loss logs")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args(argv)
 
@@ -126,10 +127,10 @@ def main(argv=None) -> int:
                 opt.step()
                 opt.zero_grad()
                 step += 1
-                if step % 10 == 0:
-                    avg = run_loss / (args.grad_accum * 10)
+                if step % args.report_every == 0:
+                    avg = run_loss / (args.grad_accum * args.report_every)
                     rate = (bi + args.batch_size) / (time.monotonic() - t0)
-                    print(f"epoch {epoch} step {step} loss {avg:.3f} ({rate:.1f} ex/s)", flush=True)
+                    print(f"epoch {epoch} step {step} loss {avg:.3f} ({rate:.2f} ex/s)", flush=True)
                     run_loss = 0.0
 
     print("merging LoRA and saving merged model ...", flush=True)
