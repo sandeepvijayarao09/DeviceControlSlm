@@ -28,6 +28,30 @@ even a tiny targeted LoRA closes most of it. `read_query` is the remaining weak 
 calls the right query tool but doesn't reliably surface the retrieved value) — next data-mix
 target. Reproduce: `make ft-data && python -m finetune.train_hf ... && make summarize`.
 
+## From-scratch device-only SLM (RQ5) — narrow beats big
+A transformer **built from scratch** (our code, random init) and trained **only** on
+device-control DSL — **~4.1M params, ~120× smaller than the 0.5B** — tops the leaderboard:
+
+| Model | Params | TSR (95% CI) | UER | speed |
+| --- | --- | --- | --- | --- |
+| **DCSLM (from scratch, device-only)** | **~4.1M** | **75.0% [64%, 86%]** | 0% | ~0.1s/task |
+| Qwen2.5-0.5B — fine-tuned | 494M | 51.6% [39%, 64%] | 0% | ~12s/task |
+| Qwen2.5-1.5B — base | 1.5B | 45.3% [33%, 58%] | 0% | — |
+
+Per category: single_tool 100%, clarify 100%, refusal 100%, compositional 70%, safety 70%,
+read_query 0%. FVR 95%, CGR 70%.
+
+**Interpretation — and the honest caveat.** This validates the core thesis: when the task is
+*only* device control, a tiny purpose-built model beats general models 100–350× its size, at a
+fraction of the latency/energy — ideal on-device. **But** this is **in-distribution**
+generalization: the training corpus and the benchmark share a phrasing *style* (both authored
+around the same command set). The corpus is decontaminated of the benchmark's exact prompts +
+paraphrases (verified 0 leaked), so this is not test-set memorization — but it does **not** yet
+measure robustness to genuinely novel user phrasings. The needed next rigor step is a held-out
+"hard paraphrase" test set written by a different process; a from-scratch model (no world
+knowledge) will drop more there than a pretrained base would. `read_query` stays 0% by design
+(the model picks the query tool but can't know the value; the runtime must fill it).
+
 ## Cross-base generalization (RQ4, cont.) — the recipe isn't Qwen-specific
 Repeating the fine-tune on a **different, fully-open base — SmolLM2-360M** (Apache-2.0, open
 *training data*, HuggingFace) — reproduces the key effect, which is strong evidence the gain
