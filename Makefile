@@ -3,7 +3,7 @@
 
 export PYTHONPATH := $(CURDIR):$(CURDIR)/python
 
-.PHONY: help seed gold test eval eval-mlx summarize ft-data ft-train
+.PHONY: help seed gold test eval eval-mlx summarize ft-data ft-train scratch-train
 
 help:
 	@echo "make seed       - (re)generate the seed benchmark JSONL"
@@ -39,3 +39,6 @@ ft-data:
 
 ft-train:
 	bash finetune/train_and_eval.sh
+
+scratch-train:
+	python3 -m scratch.train --iters 3000 --eval-every 250
