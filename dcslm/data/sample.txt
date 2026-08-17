@@ -1,30 +1,30 @@
-Activate gps, also put the phone on ringset_location_services|enabled=true ; set_ringer_mode|mode=ring
-Post this to instagram nowREFUSE
-Personal focus thanks.set_focus_mode|mode=personal
-Could you set my focus to personal, then fire up Instagram!set_focus_mode|mode=personal ; open_app|name=instagram
-Please open Camera nowopen_app|name=camera
-text dad that i'm call me for mesend_message|to=dad|body=call me
-Message Riley saying call me thanks.send_message|to=Riley|body=call me
-Play the music for me.media_control|action=play
-Hey, wake me up at 2am thanksset_alarm|time=02:00
-Please activate dark mode, then i want the hotspot on, then alarm at 12:30pmset_dark_mode|enabled=true ; set_hotspot|enabled=true ; set_alarm|time=12:30
-hey, take a screenshot, also open Instagram, also start a 10 minute timer.take_screenshot ; open_app|name=instagram ; start_timer|minutes=10
-Put the phone on vibrateset_ringer_mode|mode=vibrate
-Could you alarm at 10pm thanks.set_alarm|time=22:00
-remind me to email the report at 9:00 pm, then make the brightness 30%, then wake me up at 7 amcreate_reminder|text=email the report|time=21:00 ; set_brightness|level=30 ; set_alarm|time=07:00
-I need you to switch to silentset_ringer_mode|mode=silent
-could you previous song, also set a reminder to pick up the kids at 4am, also switch to silent!media_control|action=previous ; create_reminder|text=pick up the kids|time=04:00 ; set_ringer_mode|mode=silent
-Could you delete the operating system for meREFUSE
-Can you switch to work focus, also 2 minute timer.set_focus_mode|mode=work ; start_timer|minutes=2
-Please restartrestart_device
-Please open Spotifyopen_app|name=spotify
-Can you set my focus to sleep and then turn off cellular thanks!set_focus_mode|mode=sleep ; set_cellular_data|enabled=false
-Hack the neighbor's wifiREFUSE
-Translate this page.REFUSE
-please translate this page for meREFUSE
-can you switch to work focus, and fire up Clock pleaseset_focus_mode|mode=work ; open_app|name=clock
-post this to instagram pleaseREFUSE
-Remind me to call the dentist at 10pm, also close Instagram for mecreate_reminder|text=call the dentist|time=22:00 ; close_app|name=instagram
-could you wake me upASK
-Can you capture the screen, and set the ringer to ring pleasetake_screenshot ; set_ringer_mode|mode=ring
-Please call Taylorstart_call|to=Taylor
+hey, close Maps and then turn on bt for me.close_app|name=maps ; set_bluetooth|enabled=true
+I need you to screenshot for metake_screenshot
+could you wake me at 6:30pm and turn on low power mode and turn the brightness down to 0% nowset_alarm|time=18:30 ; set_low_power_mode|enabled=true ; set_brightness|level=0
+could you launch Music and then turn on personal focus for me!open_app|name=music ; set_focus_mode|mode=personal
+can you start Clock nowopen_app|name=clock
+Email dad about the meeting for me!compose_mail|to=dad|body=the meeting
+connection status pleaseget_connectivity_status
+Turn on sleep focus, then turn the brightness up to 50% pleaseset_focus_mode|mode=sleep ; set_brightness|level=50
+Make it brighter now.ASK
+could you put the brightness at 5set_brightness|level=5
+Email Chris about the meeting now.compose_mail|to=Chris|body=the meeting
+I need you to post this to instagram for meREFUSE
+please text Riley that i'm happy birthdaysend_message|to=Riley|body=happy birthday
+play something for meASK
+Could you make it brighter nowASK
+can you am i on wifi.get_connectivity_status
+close Notes, also skip thanksclose_app|name=notes ; media_control|action=next
+Could you set an alarm for 11:00 pm please.set_alarm|time=23:00
+go back a track, and set a reminder to book a table at 7pm thanksmedia_control|action=previous ; create_reminder|text=book a table|time=19:00
+put on mobile data thanksset_cellular_data|enabled=true
+Please set a 45 min timer, then set the brightness to 0%!start_timer|minutes=45 ; set_brightness|level=0
+alarm at 1am please.set_alarm|time=01:00
+i need you to make the volume 30%set_volume|level=30
+Can you timer for 10 minstart_timer|minutes=10
+Could you set volume 90% for me.set_volume|level=90
+screenshot, also start a 8 minute timer, also tethering off for metake_screenshot ; start_timer|minutes=8 ; set_hotspot|enabled=false
+could you set a timer for 8 minutes thanksstart_timer|minutes=8
+could you restart the phonerestart_device
+I need you to switch to silent nowset_ringer_mode|mode=silent
+Reserve a hotel in tokyo for meREFUSE

@@ -23,9 +23,24 @@ import argparse
 import random
 from pathlib import Path
 
+from bench.dataset import load_tasks
 from bench.normalize import norm_time_24h
 
 U, C, E = "\x01", "\x02", "\x03"
+
+
+def _norm(s: str) -> str:
+    return " ".join(s.lower().split()).strip(" .!,?")
+
+
+def benchmark_prompts() -> set:
+    """Every DeviceControlBench prompt + paraphrase — never allowed into training."""
+    banned = set()
+    for t in load_tasks():
+        banned.add(_norm(t["prompt"]))
+        for p in t.get("paraphrases", []):
+            banned.add(_norm(p))
+    return banned
 
 # ---- phrasing banks ---------------------------------------------------------
 ON = ["turn on", "enable", "switch on", "activate", "put on", "flip on"]
@@ -234,11 +249,15 @@ def main(argv=None) -> int:
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args(argv)
     random.seed(args.seed)
+    banned = benchmark_prompts()                   # contamination guard vs the eval set
 
-    lines, seen = [], {}
+    lines, seen, skipped = [], {}, 0
     while len(lines) < args.n:
         req, dsl = gen_one()
-        key = req.lower().strip()
+        key = _norm(req)
+        if key in banned:                          # never train on a benchmark prompt
+            skipped += 1
+            continue
         if seen.get(key, 0) >= 6:                  # cap repeats, keep diversity
             continue
         seen[key] = seen.get(key, 0) + 1
@@ -250,6 +269,9 @@ def main(argv=None) -> int:
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     uniq = len(seen)
     print(f"wrote {len(lines)} examples ({uniq} unique prompts) to {out}")
+    print(f"contamination guard: skipped {skipped} generations colliding with {len(banned)} benchmark prompts")
+    leaks = benchmark_prompts() & set(seen)
+    print(f"benchmark prompts leaked into corpus: {len(leaks)} (must be 0)")
     print(f"chars: {sum(len(l) for l in lines)} | avg line len {sum(len(l) for l in lines)//len(lines)}")
     return 0
 
