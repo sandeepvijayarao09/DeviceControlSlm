@@ -52,7 +52,11 @@ def validate(tasks: List[Dict[str, Any]] | None = None):
 
 
 def main() -> int:
-    tasks = load_tasks()
+    import sys
+    tasks_dir = None
+    if "--tasks-dir" in sys.argv:
+        tasks_dir = sys.argv[sys.argv.index("--tasks-dir") + 1]
+    tasks = load_tasks(tasks_dir=tasks_dir)
     failures = validate(tasks)
     print(f"gold replay: {len(tasks) - len(failures)}/{len(tasks)} tasks consistent")
     print(f"dataset hash: {dataset_hash(tasks)}")

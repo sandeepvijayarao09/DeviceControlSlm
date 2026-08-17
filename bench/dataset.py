@@ -14,12 +14,14 @@ CATEGORY_ORDER = [
 ]
 
 
-def load_tasks(categories: List[str] | None = None) -> List[Dict[str, Any]]:
+def load_tasks(categories: List[str] | None = None,
+               tasks_dir: Path | str | None = None) -> List[Dict[str, Any]]:
+    base = Path(tasks_dir) if tasks_dir is not None else TASKS_DIR
     tasks: List[Dict[str, Any]] = []
     for cat in CATEGORY_ORDER:
         if categories is not None and cat not in categories:
             continue
-        path = TASKS_DIR / f"{cat}.jsonl"
+        path = base / f"{cat}.jsonl"
         if not path.exists():
             continue
         for line in path.read_text(encoding="utf-8").splitlines():

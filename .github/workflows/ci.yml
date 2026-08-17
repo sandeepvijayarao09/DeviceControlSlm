@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  benchmark-and-tests:
+    name: bench + agent tests (Linux, CPU)
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # These checks are pure-Python (no torch/transformers), so CI is fast.
+      - name: Unit tests (agent core + benchmark integrity)
+        run: python -m unittest discover -s python/tests -v
+
+      - name: Gold replay — in-distribution seed split
+        run: python -m bench.gold_replay
+
+      - name: Gold replay — held-out OOD split
+        run: python -m bench.gold_replay --tasks-dir bench/tasks_ood
+
+      # Regenerate training corpora (deterministic, CPU) so the leakage gate is meaningful.
+      - name: Generate training corpora
+        run: |
+          python -m finetune.gen_data --n 800
+          python -m dcslm.gen_corpus --n 4000
+
+      - name: Contamination gate (train/test separation)
+        run: python tools/check_contamination.py
+
+  swift-package:
+    name: DeviceControlKit (macOS)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify generated App Intents are in sync with the catalog
+        run: |
+          python3 tools/gen_appintents.py
+          git diff --exit-code apple/DeviceControlKit/Sources/DeviceControlKit/Generated \
+            || (echo "::error::Generated Swift is stale — run tools/gen_appintents.py"; exit 1)
+      - name: Build
+        run: swift build --package-path apple/DeviceControlKit
+      - name: Test (DSL parse / recipe / confirmation gate)
+        run: swift test --package-path apple/DeviceControlKit

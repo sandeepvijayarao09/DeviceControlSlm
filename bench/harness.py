@@ -71,11 +71,13 @@ def main(argv: List[str] | None = None) -> int:
     ap.add_argument("--limit", type=int, default=None, help="run only first N tasks (smoke test)")
     ap.add_argument("--categories", nargs="*", default=None)
     ap.add_argument("--tag", default=None, help="results subdir label")
+    ap.add_argument("--tasks-dir", default=None,
+                    help="task split directory (default: bench/tasks; use bench/tasks_ood for held-out)")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args(argv)
 
-    tasks = load_tasks(args.categories)
-    ds_hash = dataset_hash(load_tasks())
+    tasks = load_tasks(args.categories, tasks_dir=args.tasks_dir)
+    ds_hash = dataset_hash(load_tasks(tasks_dir=args.tasks_dir))
     print(f"loading backend={args.backend} model={args.model} ...")
     t_load = time.monotonic()
     backend = make_backend(args.backend, args.model, args.dtype)
@@ -87,7 +89,7 @@ def main(argv: List[str] | None = None) -> int:
                     args.limit, args.verbose)
     wall = time.monotonic() - t0
 
-    metrics = compute(load_tasks(args.categories), runs)
+    metrics = compute(load_tasks(args.categories, tasks_dir=args.tasks_dir), runs)
     tsr_mean, tsr_lo, tsr_hi = bootstrap_ci(metrics.pop("_tsr_vector"), seed=args.seed)
 
     manifest = {

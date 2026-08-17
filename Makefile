@@ -3,7 +3,7 @@
 
 export PYTHONPATH := $(CURDIR):$(CURDIR)/python
 
-.PHONY: help seed gold test eval eval-mlx summarize ft-data ft-train scratch-train
+.PHONY: help seed gold test eval eval-mlx summarize ft-data ft-train scratch-train ood contamination appintents
 
 help:
 	@echo "make seed       - (re)generate the seed benchmark JSONL"
@@ -39,6 +39,16 @@ ft-data:
 
 ft-train:
 	bash finetune/train_and_eval.sh
+
+ood:
+	python3 -m bench.build_ood
+	python3 -m bench.gold_replay --tasks-dir bench/tasks_ood
+
+contamination:
+	python3 tools/check_contamination.py
+
+appintents:
+	python3 tools/gen_appintents.py
 
 scratch-train:
 	python3 -m scratch.train --iters 3000 --eval-every 250
