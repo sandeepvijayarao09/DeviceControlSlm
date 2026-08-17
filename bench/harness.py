@@ -37,6 +37,9 @@ def make_backend(kind: str, model: str, dtype: str):
         sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "python"))
         from eval.reference_policy import reference_policy
         return MockBackend(policy=reference_policy)
+    if kind == "scratch":  # our from-scratch, device-control-only SLM (ckpt path in `model`)
+        from dcslm.backend import ScratchDeviceBackend
+        return ScratchDeviceBackend(model)
     raise SystemExit(f"unknown backend: {kind}")
 
 
@@ -58,7 +61,7 @@ def run_eval(backend, tasks: List[Dict[str, Any]], max_tokens: int, temperature:
 
 def main(argv: List[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Run DeviceControlBench.")
-    ap.add_argument("--backend", default="hf", choices=["hf", "mlx", "mock"])
+    ap.add_argument("--backend", default="hf", choices=["hf", "mlx", "mock", "scratch"])
     ap.add_argument("--model", default="Qwen/Qwen2.5-0.5B-Instruct")
     ap.add_argument("--dtype", default="float32")
     ap.add_argument("--temperature", type=float, default=0.0)

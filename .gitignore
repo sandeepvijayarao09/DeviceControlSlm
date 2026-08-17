@@ -29,3 +29,7 @@ DerivedData/
 # From-scratch track: checkpoints and downloaded corpus
 scratch/out/
 scratch/data/
+
+# From-scratch device SLM: checkpoint + full corpus (regenerate with dcslm.gen_corpus)
+dcslm/out/
+dcslm/data/corpus.txt
