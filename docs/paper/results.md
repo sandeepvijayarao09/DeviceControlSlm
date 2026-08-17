@@ -28,6 +28,29 @@ even a tiny targeted LoRA closes most of it. `read_query` is the remaining weak 
 calls the right query tool but doesn't reliably surface the retrieved value) — next data-mix
 target. Reproduce: `make ft-data && python -m finetune.train_hf ... && make summarize`.
 
+## Cross-base generalization (RQ4, cont.) — the recipe isn't Qwen-specific
+Repeating the fine-tune on a **different, fully-open base — SmolLM2-360M** (Apache-2.0, open
+*training data*, HuggingFace) — reproduces the key effect, which is strong evidence the gain
+comes from our data/method, not one base:
+
+| | base | fine-tuned | Δ |
+| --- | --- | --- | --- |
+| **SmolLM2-360M TSR** | 10.9% | **29.7%** | **+18.8** |
+| SmolLM2 compositional | 0% | **60%** | **+60** |
+| SmolLM2 single_tool | 21% | **79%** | **+57** |
+| Qwen2.5-0.5B TSR (for reference) | 29.7% | **51.6%** | +21.9 |
+| Qwen2.5-0.5B compositional | 0% | **60%** | +60 |
+
+**compositional 0%→60% on *both* bases.** Two honest caveats on SmolLM2: (a) at 360M it starts
+much weaker and its fine-tuned TSR (29.7%) lands below fine-tuned Qwen-0.5B (51.6%) — capacity
+and base quality still matter; (b) SmolLM2's `no_op_refusal` *regressed* 30%→0% (the fine-tune
+over-shifted it toward acting; ORR fell to 6.8%), a data-mixture issue to correct. UER stayed 0%
+on every model.
+
+**Base recommendation.** For pure quality-per-size today: **Qwen2.5-0.5B fine-tuned**. For clean
+provenance (Apache-2.0 + open data, no Qwen dependency) without sacrificing much: fine-tune
+**SmolLM2-1.7B** (360M is too small to ship as the primary) — next run.
+
 ## Headline table
 | Model | N | TSR (95% CI) | TSA | AEM | Slot-F1 | FVR | TurnEff | CGR | ORR | UER |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
