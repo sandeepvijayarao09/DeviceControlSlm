@@ -52,30 +52,38 @@ measure robustness to genuinely novel user phrasings. The needed next rigor step
 knowledge) will drop more there than a pretrained base would. `read_query` stays 0% by design
 (the model picks the query tool but can't know the value; the runtime must fill it).
 
+> **Update (see RQ6):** the held-out OOD test confirmed exactly this caveat. This 75% is an
+> in-distribution number; on novel phrasing the from-scratch model drops to ~33% and the
+> fine-tuned pretrained base overtakes it. Read RQ5 together with RQ6.
+
 ## Held-out OOD test (RQ6) — the result that reframes everything
 Evaluating on `bench/tasks_ood` (independently authored, novel phrasing, verified 0 leakage):
 
-| Model | Params | In-distribution TSR | **Held-out OOD TSR** | Δ |
+Held-out set `bench/tasks_ood` (independently authored, novel verbs + indirect intents, verified
+0 leakage). Numbers below use the **n=55** set and the **P1/P2 diversified** from-scratch model.
+
+| Model | Params | In-distribution TSR | **Held-out OOD-55 TSR** | Δ |
 | --- | --- | --- | --- | --- |
-| DCSLM (from scratch) | ~4.1M | 75.0% | **35.5%** [19, 52] | **−40** |
-| Qwen-0.5B fine-tuned | 494M | 51.6% | **32.3%** [16, 48] | −19 |
-| Qwen-0.5B **base** | 494M | 29.7% | **32.3%** | **+3** |
+| Qwen-0.5B **fine-tuned** | 494M | 51.6% | **36.4%** [24, 49] | −15 |
+| DCSLM (from scratch) | ~4.1M | 67.2% | **32.7%** [20, 46] | −34 |
+| Qwen-0.5B base | 494M | 29.7% | **27.3%** | −2 |
 
 **Reading this honestly:**
-- The **base model is phrasing-invariant** (29.7% → 32.3%, within noise): its pretrained language
-  understanding transfers to wording it never saw.
-- The **specialized models were substantially memorizing phrasing.** On held-out phrasing the
-  from-scratch model loses 40 points and its large in-distribution lead **collapses into a
-  statistical tie** with the base (all three ≈ 32–36%, CIs overlap heavily at n=31).
-- So the earlier "narrow-from-scratch beats big" headline is an **in-distribution** artifact.
-  The robust, generalizable capability comes from **pretraining**, which is precisely why the
-  product should **specialize an open base** rather than train from scratch. The from-scratch
-  model remains valuable as the tiny/fast/ownable option, but needs far more phrasing diversity
-  (or distillation) to close the OOD gap.
+- **The ranking flips out-of-distribution.** In-distribution the from-scratch model dominates
+  (67%); on held-out phrasing the **fine-tuned pretrained base leads** (36.4% vs 32.7%).
+- **Generalization drop scales inversely with pretraining:** from-scratch −34, fine-tuned base
+  −15, base −2. The more a model leans on our training phrasing, the more it loses on novel
+  phrasing; the base's broad language prior transfers almost unchanged.
+- **Diversification helped but didn't close the gap.** Tripling phrasing diversity + adding
+  indirect intents (P1/P2) traded in-distribution (75%→67%) for only a few OOD points — evidence
+  that data diversity alone can't substitute for pretraining's language understanding.
+- **Product implication:** for robustness to how people actually phrase things, **specialize an
+  open base**. Keep the from-scratch model as the tiny/fast/ownable option, but it needs
+  distillation or far more data to generalize.
 
-**Statistical caveat:** the OOD split is small (n=31); the three OOD scores are not statistically
-distinguishable. The robust claims are the *directions*: from-scratch has the largest in-dist→OOD
-drop; the base has ~none. A larger, human-authored OOD set is the next step.
+**Statistical caveat:** at n=55 the three OOD scores (36.4 / 32.7 / 27.3) still have overlapping
+CIs — not definitively separated. The robust, repeatable claim is the *direction* of the drops.
+A larger, **human-authored** OOD set is the next rigor step.
 
 ## Cross-base generalization (RQ4, cont.) — the recipe isn't Qwen-specific
 Repeating the fine-tune on a **different, fully-open base — SmolLM2-360M** (Apache-2.0, open
