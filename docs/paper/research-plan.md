@@ -130,3 +130,22 @@ under CC BY 4.0; datasheet + ethics statement (no real PII — synthetic contact
 | M5 ablations | ablation tables | §Analysis (RQ4) |
 | M6 scale dataset to 500+ w/ human validation | v1.0 dataset + datasheet | §Benchmark, appendix |
 | M7 Swift on-device runtime + phone numbers | device results | §System, §Results |
+
+## 10. Findings so far (answers to the RQs — see `results.md`)
+- **RQ1 (can small models do device control?)** Yes, with limits. A fine-tuned 0.5B reaches
+  51.6% in-distribution; a from-scratch ~4M model reaches 67.2% in-distribution.
+- **RQ3 (safety):** the confirmation gate is a runtime invariant — **UER = 0%** across *every*
+  model, independent of accuracy.
+- **RQ4 (specialization):** LoRA nearly doubled the base 0.5B (29.7%→51.6%) and the effect
+  reproduces on a second base (SmolLM2), so the gain is the method, not one base.
+- **RQ5 (from scratch):** a purpose-built ~4M model tops the in-distribution leaderboard —
+  narrow task ⇒ tiny model viable.
+- **RQ6 (generalization, the key result):** on a held-out OOD split the ranking **flips** —
+  the fine-tuned *pretrained* base (36.4%) beats the from-scratch model (32.7%); drop scales
+  inversely with pretraining (−15 vs −34 vs −2). **Robust generalization comes from
+  pretraining**, so the shipped product should specialize an open base; the from-scratch model
+  is the tiny/ownable option pending more data or distillation.
+
+**Threats to validity (current):** small OOD set (n=55, overlapping CIs — directions are the
+robust claim); single training seed (variance bars pending); OOD authored by us (human-authored
+set pending); quality track only (Apple-Silicon efficiency numbers pending).

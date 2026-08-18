@@ -1,59 +1,83 @@
 # DeviceControlSlm
 
-An on-device **agentic** system built around a **Small Language Model (SLM)** that runs
-locally on Apple devices — iPhone, iPad, and MacBook — using Apple's
-[**MLX**](https://github.com/ml-explore/mlx) framework.
+An **on-device, agentic Small Language Model whose only job is device control** on iPhone, iPad,
+and Mac. Not a chatbot: it maps a natural-language request to a structured OS command (or asks /
+declines) and takes the action — locally, privately, under a non-bypassable confirmation gate.
 
-The goal is *not* to build a general-purpose chatbot. It is to build a compact model +
-runtime whose one job is **agentic device control**: understand a user request, plan,
-call tools, and take real actions on the device — entirely on-device, private, and offline.
+The centerpiece is **DCSLM**, a transformer **built from scratch** (our own architecture,
+tokenizer, and weights trained from random init on our own data — see
+[`docs/paper/provenance.md`](docs/paper/provenance.md)). Pretrained open models (Qwen2.5,
+SmolLM2), specialized with LoRA, are kept as honest baselines.
 
-> **Status: building toward a conference paper** (benchmark + system). Implemented and passing:
-> the portable **agent core** ([`python/`](python/)), **DeviceControlBench** — an executable
-> benchmark ([`bench/`](bench/)), and a **publication-grade eval harness** with real metrics,
-> bootstrap CIs, and reproducible run manifests. Real model numbers land in [`results/`](results/).
-> The Swift/MLX on-device app and the Apple-Silicon efficiency study are next.
+## Key results (DeviceControlBench, executable success, temperature 0)
 
-## Try it now (no GPU, no model)
+| Model | Params | In-distribution | **Held-out OOD (n=55)** | UER |
+| --- | --- | --- | --- | --- |
+| DCSLM (from scratch) | ~4.1M | **67.2%** | 32.7% [20, 46] | 0% |
+| Qwen2.5-0.5B fine-tuned | 494M | 51.6% | **36.4%** [24, 49] | 0% |
+| Qwen2.5-0.5B base | 494M | 29.7% | 27.3% | 0% |
+
+**The honest headline:** a tiny from-scratch model *dominates in-distribution* but generalizes
+worst to novel phrasing — on held-out phrasing the fine-tuned **pretrained** base overtakes it.
+Robust capability comes from pretraining. The **confirmation gate holds regardless** (unsafe-
+execution rate = 0% for every model). Full analysis: [`docs/paper/results.md`](docs/paper/results.md).
+
+## Repository
+
+| Path | What |
+| --- | --- |
+| [`scratch/`](scratch/) | The from-scratch transformer (model, training, sampling). |
+| [`dcslm/`](dcslm/) | Device-control corpus generator + the eval backend adapter. |
+| [`finetune/`](finetune/) | LoRA specialization of open bases (portable HF + MLX). |
+| [`bench/`](bench/) | DeviceControlBench: catalog, sandbox, checkers, harness, stats, `tasks/` (seed) + `tasks_ood/` (held-out). |
+| [`python/agentcore/`](python/agentcore/) | Portable agent loop, parser, tool registry, safety gate. |
+| [`apple/DeviceControlKit/`](apple/DeviceControlKit/) | Swift runtime + **App Intents / Shortcuts / Accessibility** execution layer. |
+| [`apple/DeviceControlApp/`](apple/DeviceControlApp/) | Minimal SwiftUI app (iOS/iPadOS/macOS). |
+| [`tools/`](tools/) | App Intents generator, Core ML export, contamination gate. |
+| [`results/`](results/) | Run manifests + leaderboard. |
+
+## Reproduce (no GPU, no Apple hardware)
 ```bash
-make gold                                    # validate benchmark integrity (48/48 tasks)
-make test                                    # agent-core + benchmark unit tests
-make eval MODEL=Qwen/Qwen2.5-1.5B-Instruct   # run a REAL model over the benchmark (CPU/GPU)
-make summarize                               # aggregate results/ -> leaderboard
+make test           # agent-core + benchmark unit tests
+make gold           # gold-replay both splits (every task passes its own checker)
+make contamination  # train/test leakage gate (0 leaks)
+
+# the from-scratch device SLM, end to end (CPU):
+python -m dcslm.gen_corpus --n 40000          # build the corpus
+python -m scratch.train --data dcslm/data/corpus.txt --out dcslm/out --iters 5000
+python -m bench.harness --backend scratch --model dcslm/out/ckpt.pt                    # in-dist
+python -m bench.harness --backend scratch --model dcslm/out/ckpt.pt --tasks-dir bench/tasks_ood
+make summarize      # aggregate results/ -> leaderboard
 ```
-On an Apple Silicon Mac, `pip install mlx-lm` then `make eval-mlx MODEL=...` for the real
-on-device model plus latency/memory/energy numbers.
+On a Mac: `python tools/gen_appintents.py && swift test --package-path apple/DeviceControlKit`,
+`python tools/export_coreml.py` for the Core ML model, then open `apple/DeviceControlApp` in Xcode.
+
+## How it works
+```
+request → DCSLM → command DSL ("set_wifi|enabled=false ; set_brightness|level=30" / ASK / REFUSE)
+        → agent loop → confirmation gate (safe/confirm/blocked)
+        → per-OS recipe: Direct API → Shortcuts/App Intents → Accessibility → (unsupported)
+```
+The recipe is how iOS system toggles (no direct API) still work — via system Shortcuts actions.
+One `catalog.json` drives the model's commands, the benchmark, and the App Intents (they can't drift).
+
+## Testing (industry-standard)
+Executable success (device state, not string match), bootstrap 95% CIs + McNemar, **held-out OOD
+split**, a **contamination gate**, determinism + run manifests, and **CI on every push**
+(unit tests, gold replay, leakage gate, Swift build/test). See
+[`docs/paper/testing.md`](docs/paper/testing.md).
 
 ## Documents
-
-| Doc | What it covers |
+| Doc | Covers |
 | --- | --- |
-| [`docs/paper/research-plan.md`](docs/paper/research-plan.md) | The paper: contributions, research questions, statistical protocol, model sweep, ablations, threats to validity. |
-| [`docs/paper/benchmark-design.md`](docs/paper/benchmark-design.md) | DeviceControlBench spec + datasheet. |
-| [`docs/paper/eval-protocol.md`](docs/paper/eval-protocol.md) | Precise metric & statistics definitions. |
-| [`docs/design.md`](docs/design.md) | System architecture: layers, model choices, agent loop, tool system, per-platform control, safety, privacy. |
-| [`docs/roadmap.md`](docs/roadmap.md) · [`docs/decisions.md`](docs/decisions.md) | Phased build plan and decision log (ADRs). |
-| [`bench/`](bench/) · [`python/`](python/) | The benchmark + eval harness, and the agent core. |
+| [`research-plan.md`](docs/paper/research-plan.md) | Contributions, RQs, statistics, ablations, threats. |
+| [`dcslm-architecture.md`](docs/paper/dcslm-architecture.md) | The from-scratch model + system design. |
+| [`benchmark-design.md`](docs/paper/benchmark-design.md) | DeviceControlBench spec + datasheet. |
+| [`eval-protocol.md`](docs/paper/eval-protocol.md) · [`testing.md`](docs/paper/testing.md) | Metrics/stats; test methodology. |
+| [`results.md`](docs/paper/results.md) | All findings (in-dist, OOD, fine-tune, cross-base). |
+| [`model-card.md`](docs/paper/model-card.md) · [`provenance.md`](docs/paper/provenance.md) | Model card; what's from scratch. |
 
-## The short version
-
-- **Model:** a 0.5B–3B open instruct model (e.g. Qwen2.5, Llama-3.2, SmolLM2), 4-bit
-  quantized, sized to the device's RAM. Optional LoRA fine-tune later to harden tool-calling.
-- **Runtime:** MLX — `mlx-lm` (Python) for fast development/eval, `mlx-swift` for on-device.
-- **Agent:** a tight tool-calling loop (ReAct-style) with constrained JSON decoding, a small
-  tool registry, short-term memory, and a hard safety/confirmation layer.
-- **Device control, three scopes:**
-  1. **In-app actions** — tools defined by the app, always allowed, no entitlements.
-  2. **OS actions via App Intents / Shortcuts** — alarms, messages, calendar, opening apps
-     (iOS, iPadOS, macOS — within Apple's APIs).
-  3. **macOS Accessibility control** — drive other apps' UI on the Mac (click, type, read).
-- **Shape:** one Swift package for the portable core, one multiplatform SwiftUI app,
-  platform-specific tool adapters.
-
-## Why this is realistic (and where the walls are)
-
-Apple's sandbox means an iOS app cannot freely control the OS or other apps. What *is*
-possible — and what this project leans on — is App Intents/Shortcuts and framework APIs
-(EventKit, Contacts, HomeKit, MapKit, …) on iOS/iPadOS, plus the far more powerful
-Accessibility and Apple Events APIs on macOS. The design is explicit about what each
-platform can and cannot do, so we don't promise capabilities the OS won't grant.
+## Honest limitations
+- OOD generalization gap (from-scratch model); small held-out set (n=55) → OOD numbers are
+  directional. `read_query` = 0% by design. English-only. On-device execution controllers and
+  Core ML export are validated by structure/CI but finalized on a Mac (they need Apple SDKs).
