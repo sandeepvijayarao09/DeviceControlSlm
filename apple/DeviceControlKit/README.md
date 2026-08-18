@@ -47,8 +47,15 @@ swift test --package-path apple/DeviceControlKit   # parsing/recipe/gate tests (
 
 ## What ships vs. what's scaffolded
 - **Complete + compiling:** the App Intents, the recipe, the executor engine, the confirmation
-  gate, the DSL parser, and a `StubDeviceController` (logs) so it builds and runs in Simulator/
-  Previews and under `swift test`.
-- **To fill in on device:** the real bodies of `DirectAPIExecutor` targets (per-OS
-  `DeviceControlling` conformances), `ShortcutsExecutor` (invoke the named system action), and
-  `AccessibilityExecutor` (AX automation). Each is marked `TODO(device)`.
+  gate, the DSL parser, the `DeviceAgent` runtime, and generated `unsupported` defaults so any
+  controller only implements what it supports.
+- **Real per-OS controllers:**
+  - `DeviceController+macOS.swift` — genuine implementations via `Process` (osascript /
+    networksetup / open / pbcopy / screencapture / pmset) for Wi-Fi, volume, mute, dark mode,
+    wallpaper, apps, media, restart/shutdown, clipboard, battery/storage queries.
+  - `DeviceController+iOS.swift` — genuine UIKit/AVFoundation/MediaPlayer for brightness,
+    clipboard, flashlight, app deep-links, calls, media, battery/storage. Radios/system modes
+    (no public API) fall through to the Shortcuts mechanism per the recipe.
+- **Still stubbed (device work):** `ShortcutsExecutor` (invoke the named system action) and
+  `AccessibilityExecutor` (AX automation) — marked `TODO(device)`; the routing that decides when
+  to use them is done.

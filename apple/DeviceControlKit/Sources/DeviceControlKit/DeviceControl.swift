@@ -15,9 +15,18 @@ public enum DeviceControlError: Error, CustomStringConvertible {
     }
 }
 
-/// Global entry point. `shared` is the concrete controller for this build;
-/// inject a real per-OS controller on device (see DeviceController+iOS/macOS),
-/// or leave the generated `StubDeviceController` for Simulator/Previews/tests.
+/// Global entry point. `shared` selects the real per-OS controller; unimplemented
+/// commands fall through to the generated `unsupported` defaults (which makes the
+/// recipe engine try Shortcuts / Accessibility next). Override with
+/// `StubDeviceController()` in tests/Previews.
 public enum DeviceControl {
-    public static var shared: DeviceControlling = StubDeviceController()
+    public static var shared: DeviceControlling = {
+        #if os(macOS)
+        return MacDeviceController()
+        #elseif os(iOS)
+        return IOSDeviceController()
+        #else
+        return StubDeviceController()
+        #endif
+    }()
 }

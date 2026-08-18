@@ -3,6 +3,12 @@ import XCTest
 
 final class DeviceAgentTests: XCTestCase {
 
+    // Isolate tests from real system side effects (no osascript/networksetup on CI).
+    override func setUp() {
+        super.setUp()
+        DeviceControl.shared = StubDeviceController()
+    }
+
     func testExecutesModelPlan() async throws {
         let model = StubLanguageModel { _ in "set_brightness|level=30" }
         let agent = DeviceAgent(model: model)
