@@ -131,7 +131,7 @@ under CC BY 4.0; datasheet + ethics statement (no real PII — synthetic contact
 | M6 scale dataset to 500+ w/ human validation | v1.0 dataset + datasheet | §Benchmark, appendix |
 | M7 Swift on-device runtime + phone numbers | device results | §System, §Results |
 
-## 10. Findings so far (answers to the RQs — see `results.md`)
+## 11. Findings so far (answers to the RQs — see `results.md`)
 - **RQ1 (can small models do device control?)** Yes, with limits. A fine-tuned 0.5B reaches
   51.6% in-distribution; a from-scratch ~4M model reaches 67.2% in-distribution.
 - **RQ3 (safety):** the confirmation gate is a runtime invariant — **UER = 0%** across *every*
