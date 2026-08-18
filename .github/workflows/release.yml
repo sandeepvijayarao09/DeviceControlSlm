@@ -1,0 +1,63 @@
+name: Release (CD)
+
+# Continuous delivery: on a version tag, verify, package the docs/leaderboard,
+# build the Swift package, and publish a GitHub Release with those assets.
+# Model weights / signed app binaries are attached manually or in a follow-up
+# job that has the trained checkpoint and Apple signing secrets.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Tests + gold replay + leakage gate
+        run: |
+          python -m unittest discover -s python/tests
+          python -m bench.gold_replay
+          python -m bench.gold_replay --tasks-dir bench/tasks_ood
+          python -m finetune.gen_data --n 800
+          python -m dcslm.gen_corpus --n 4000
+          python tools/check_contamination.py
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package release assets
+        run: |
+          mkdir -p dist
+          cp results/leaderboard.md results/leaderboard.csv dist/ 2>/dev/null || true
+          cp docs/paper/results.md docs/paper/model-card.md docs/paper/provenance.md dist/ 2>/dev/null || true
+          tar -czf dist/devicecontrolbench-tasks.tgz bench/tasks bench/tasks_ood bench/tools/catalog.json
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/leaderboard.md
+            dist/model-card.md
+            dist/results.md
+            dist/provenance.md
+            dist/devicecontrolbench-tasks.tgz
+
+  swift-package:
+    needs: verify
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build -c release --package-path apple/DeviceControlKit
+      # Model export (Core ML) + app signing/TestFlight would run here once the
+      # trained checkpoint and Apple signing secrets are provided.
