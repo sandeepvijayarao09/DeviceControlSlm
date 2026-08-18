@@ -43,10 +43,14 @@ def benchmark_prompts() -> set:
     return banned
 
 # ---- phrasing banks ---------------------------------------------------------
-ON = ["turn on", "enable", "switch on", "activate", "put on", "flip on"]
-OFF = ["turn off", "disable", "switch off", "deactivate", "kill", "shut off", "flip off"]
-POLITE = ["", "", "", "please ", "can you ", "could you ", "hey, ", "i need you to "]
-TAIL = ["", "", "", " please", " for me", " now", " thanks"]
+ON = ["turn on", "enable", "switch on", "activate", "put on", "flip on", "get", "bring up",
+      "fire up", "power on", "pop on", "kick on", "toggle on"]
+OFF = ["turn off", "disable", "switch off", "deactivate", "kill", "shut off", "flip off",
+       "cut", "cut off", "drop", "power down", "toggle off", "knock off"]
+POLITE = ["", "", "", "please ", "can you ", "could you ", "hey, ", "i need you to ",
+          "would you ", "mind ", "let's ", "go ahead and ", "i'd like you to "]
+TAIL = ["", "", "", " please", " for me", " now", " thanks", " real quick", " if you can",
+        " right now", " already"]
 
 TOGGLES = {
     "set_wifi": ["wifi", "wi-fi", "the wifi", "wireless"],
@@ -189,8 +193,38 @@ def g_comms():
     return random.choice([f"call {n}", f"give {n} a call", f"phone {n}"]), f"start_call|to={n}"
 
 
+# Indirect intents: situational phrasing -> the command a person means. Teaches the
+# model to handle real requests that never name the setting explicitly.
+INTENTS = [
+    (["i'm going to bed", "time for bed", "heading to sleep", "going to sleep now",
+      "off to bed", "calling it a night"], "set_focus_mode|mode=sleep"),
+    (["i'm getting on a plane", "boarding now", "about to take off", "getting on my flight",
+      "we're taking off"], "set_airplane_mode|enabled=true"),
+    (["save my battery", "my battery is dying", "battery's low", "need to conserve battery",
+      "running low on juice"], "set_low_power_mode|enabled=true"),
+    (["i'm driving now", "about to drive", "getting in the car", "starting my commute"],
+     "set_focus_mode|mode=driving"),
+    (["i'm at the gym", "starting my workout", "time to work out", "heading to the gym"],
+     "set_focus_mode|mode=fitness"),
+    (["i'm in a meeting", "heading into a meeting", "don't disturb me", "hold my notifications"],
+     "set_do_not_disturb|enabled=true"),
+    (["it's too bright", "the screen is blinding me", "too much glare", "ease the brightness"],
+     "set_brightness|level=20"),
+    (["i can't see the screen", "the screen's too dark", "brighten things up"],
+     "set_brightness|level=90"),
+    (["i'm back", "i'm done with my meeting", "turn notifications back on"],
+     "set_do_not_disturb|enabled=false"),
+    (["it's dark in here", "i need some light", "light it up"], "set_flashlight|enabled=true"),
+]
+
+
+def g_intent():
+    frags, cmd = random.choice(INTENTS)
+    return random.choice(frags), cmd
+
+
 ACTIONS = [g_toggle, g_level, g_alarm, g_timer, g_app, g_media, g_focus, g_ringer,
-           g_screenshot, g_reminder, g_power, g_comms]
+           g_screenshot, g_reminder, g_power, g_comms, g_intent]
 
 # actions safe to chain in a compositional request (avoid power/comms noise)
 CHAINABLE = [g_toggle, g_level, g_alarm, g_timer, g_app, g_media, g_focus, g_ringer,
@@ -244,7 +278,7 @@ def gen_one():
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n", type=int, default=16000)
+    ap.add_argument("--n", type=int, default=40000)
     ap.add_argument("--out", default="dcslm/data/corpus.txt")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args(argv)

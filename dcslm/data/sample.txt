@@ -1,30 +1,30 @@
-hey, close Maps and then turn on bt for me.close_app|name=maps ; set_bluetooth|enabled=true
-I need you to screenshot for metake_screenshot
-could you wake me at 6:30pm and turn on low power mode and turn the brightness down to 0% nowset_alarm|time=18:30 ; set_low_power_mode|enabled=true ; set_brightness|level=0
-could you launch Music and then turn on personal focus for me!open_app|name=music ; set_focus_mode|mode=personal
-can you start Clock nowopen_app|name=clock
-Email dad about the meeting for me!compose_mail|to=dad|body=the meeting
-connection status pleaseget_connectivity_status
-Turn on sleep focus, then turn the brightness up to 50% pleaseset_focus_mode|mode=sleep ; set_brightness|level=50
-Make it brighter now.ASK
-could you put the brightness at 5set_brightness|level=5
-Email Chris about the meeting now.compose_mail|to=Chris|body=the meeting
-I need you to post this to instagram for meREFUSE
-please text Riley that i'm happy birthdaysend_message|to=Riley|body=happy birthday
-play something for meASK
-Could you make it brighter nowASK
-can you am i on wifi.get_connectivity_status
-close Notes, also skip thanksclose_app|name=notes ; media_control|action=next
-Could you set an alarm for 11:00 pm please.set_alarm|time=23:00
-go back a track, and set a reminder to book a table at 7pm thanksmedia_control|action=previous ; create_reminder|text=book a table|time=19:00
-put on mobile data thanksset_cellular_data|enabled=true
-Please set a 45 min timer, then set the brightness to 0%!start_timer|minutes=45 ; set_brightness|level=0
-alarm at 1am please.set_alarm|time=01:00
-i need you to make the volume 30%set_volume|level=30
-Can you timer for 10 minstart_timer|minutes=10
-Could you set volume 90% for me.set_volume|level=90
-screenshot, also start a 8 minute timer, also tethering off for metake_screenshot ; start_timer|minutes=8 ; set_hotspot|enabled=false
-could you set a timer for 8 minutes thanksstart_timer|minutes=8
-could you restart the phonerestart_device
-I need you to switch to silent nowset_ringer_mode|mode=silent
-Reserve a hotel in tokyo for meREFUSE
+Please fire up low power mode and capture the screen now.set_low_power_mode|enabled=true ; take_screenshot
+Let's delete the operating system right now.REFUSE
+Go ahead and switch to ring, then switch to work focus for meset_ringer_mode|mode=ring ; set_focus_mode|mode=work
+let's volume to 5, also grab a screenshotset_volume|level=5 ; take_screenshot
+Mind screenshot nowtake_screenshot
+go ahead and remind me to water the plants, then set alarm 9am alreadycreate_reminder|text=water the plants ; set_alarm|time=09:00
+Start a 60 minute timer, also set alarm 2pm, also i want mute off if you canstart_timer|minutes=60 ; set_alarm|time=14:00 ; set_mute|enabled=false
+Could you 10 minute timer and capture the screen right nowstart_timer|minutes=10 ; take_screenshot
+Switch off low power, then make the brightness 0% now.set_low_power_mode|enabled=false ; set_brightness|level=0
+Going to sleep nowset_focus_mode|mode=sleep
+I'd like you to how much storage is left real quick!get_storage
+Would you stop the music, then make the brightness 5%.media_control|action=stop ; set_brightness|level=5
+let's switch to vibrate and then set a 1 min timer thanksset_ringer_mode|mode=vibrate ; start_timer|minutes=1
+Orientation lock off real quick.set_orientation_lock|enabled=false
+Switch to ring, also alarm at 1am, also bluetooth on thanks.set_ringer_mode|mode=ring ; set_alarm|time=01:00 ; set_bluetooth|enabled=true
+Please translate this page real quickREFUSE
+Battery saver off and 1 minute timerset_low_power_mode|enabled=false ; start_timer|minutes=1
+Would you set a reminder to buy milk at 12am, then wake me at 7 am, then i want dark mode offcreate_reminder|text=buy milk|time=00:00 ; set_alarm|time=07:00 ; set_dark_mode|enabled=false
+Let's previous song and then remind me to water the plants at 7:00pm thanksmedia_control|action=previous ; create_reminder|text=water the plants|time=19:00
+Would you change the brightness to 90 percent and set the ringer to silent real quickset_brightness|level=90 ; set_ringer_mode|mode=silent
+Set a timer for 15 minutes already.start_timer|minutes=15
+could you set a 90 min timer, then change the brightness to 100 percent if you canstart_timer|minutes=90 ; set_brightness|level=100
+Work focus, and open Chrome, and put the volume at 10 for meset_focus_mode|mode=work ; open_app|name=chrome ; set_volume|level=10
+Would you put the volume at 0 for meset_volume|level=0
+Getting in the car nowset_focus_mode|mode=driving
+Summarize this pdf if you can!REFUSE
+I'd like you to set the ringer to vibrate, and set brightness 50%, and bring up dark theme thanks.set_ringer_mode|mode=vibrate ; set_brightness|level=50 ; set_dark_mode|enabled=true
+would you screenshot!take_screenshot
+Hey, set a reminder to pick up the kids at 11pm if you cancreate_reminder|text=pick up the kids|time=23:00
+Can you timer for 2 min thanksstart_timer|minutes=2
