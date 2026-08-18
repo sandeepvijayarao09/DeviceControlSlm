@@ -19,6 +19,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# Export mode swaps fused SDPA / dynamic slices for plain ops that Core ML's
+# torch converter handles cleanly. Off during training (fast path).
+EXPORT_MODE = False
+
+
+def set_export_mode(v: bool) -> None:
+    global EXPORT_MODE
+    EXPORT_MODE = v
+
 
 @dataclass
 class GPTConfig:
@@ -59,8 +68,11 @@ def apply_rope(x, cos, sin):
     d = x.shape[-1]
     x1, x2 = x[..., : d // 2], x[..., d // 2:]
     rotated = torch.cat([-x2, x1], dim=-1)
-    cos = cos[: x.shape[-2]].unsqueeze(0).unsqueeze(0)
-    sin = sin[: x.shape[-2]].unsqueeze(0).unsqueeze(0)
+    if not EXPORT_MODE:
+        cos = cos[: x.shape[-2]]
+        sin = sin[: x.shape[-2]]
+    cos = cos.unsqueeze(0).unsqueeze(0)
+    sin = sin.unsqueeze(0).unsqueeze(0)
     return x * cos + rotated * sin
 
 
@@ -78,18 +90,31 @@ class Attention(nn.Module):
         self.v_proj = nn.Linear(cfg.n_embd, cfg.n_kv_head * self.head_dim, bias=True)
         self.o_proj = nn.Linear(cfg.n_head * self.head_dim, cfg.n_embd, bias=False)
         self.dropout = cfg.dropout
+        self.block = cfg.block_size
+        self.n_embd = cfg.n_embd
 
     def forward(self, x, cos, sin):
-        B, T, C = x.shape
+        if EXPORT_MODE:                       # static Python-int dims (no shape ops for Core ML)
+            B, T, C = 1, self.block, self.n_embd
+        else:
+            B, T, C = x.shape
         q = self.q_proj(x).view(B, T, self.n_head, self.head_dim).transpose(1, 2)
         k = self.k_proj(x).view(B, T, self.n_kv_head, self.head_dim).transpose(1, 2)
         v = self.v_proj(x).view(B, T, self.n_kv_head, self.head_dim).transpose(1, 2)
         q, k = apply_rope(q, cos, sin), apply_rope(k, cos, sin)
-        # expand the 2 kv heads to match the 6 query heads (this IS grouped-query attn)
+        # expand the 2 kv heads to match the query heads (this IS grouped-query attn)
         k = k.repeat_interleave(self.n_rep, dim=1)
         v = v.repeat_interleave(self.n_rep, dim=1)
-        y = F.scaled_dot_product_attention(q, k, v, is_causal=True,
-                                           dropout_p=self.dropout if self.training else 0.0)
+        if EXPORT_MODE:
+            # plain attention with an explicit causal mask (Core ML-friendly)
+            scale = 1.0 / math.sqrt(self.head_dim)
+            att = (q @ k.transpose(-2, -1)) * scale
+            mask = torch.tril(torch.ones(T, T)).view(1, 1, T, T)
+            att = att.masked_fill(mask == 0, -1e9)
+            y = F.softmax(att, dim=-1) @ v
+        else:
+            y = F.scaled_dot_product_attention(q, k, v, is_causal=True,
+                                               dropout_p=self.dropout if self.training else 0.0)
         y = y.transpose(1, 2).contiguous().view(B, T, C)
         return self.o_proj(y)
 

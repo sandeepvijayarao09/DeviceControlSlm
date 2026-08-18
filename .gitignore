@@ -33,3 +33,7 @@ scratch/data/
 # From-scratch device SLM: checkpoint + full corpus (regenerate with dcslm.gen_corpus)
 dcslm/out/
 dcslm/data/corpus.txt
+
+# On-device model binaries (produced by export scripts on the Mac)
+apple/DeviceControlKit/Models/*.mlpackage
+apple/DeviceControlKit/Models/*.mlmodelc
