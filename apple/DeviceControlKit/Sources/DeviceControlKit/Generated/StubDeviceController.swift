@@ -6,130 +6,130 @@ import Foundation
 public final class StubDeviceController: DeviceControlling {
     public init() {}
     public func setWifi(enabled: Bool) async throws {
-        DeviceLog.emit("set_wifi", "\(enabled)")
+        DeviceLog.emit("set_wifi")
     }
     public func setBluetooth(enabled: Bool) async throws {
-        DeviceLog.emit("set_bluetooth", "\(enabled)")
+        DeviceLog.emit("set_bluetooth")
     }
     public func setAirplaneMode(enabled: Bool) async throws {
-        DeviceLog.emit("set_airplane_mode", "\(enabled)")
+        DeviceLog.emit("set_airplane_mode")
     }
     public func setCellularData(enabled: Bool) async throws {
-        DeviceLog.emit("set_cellular_data", "\(enabled)")
+        DeviceLog.emit("set_cellular_data")
     }
     public func setHotspot(enabled: Bool) async throws {
-        DeviceLog.emit("set_hotspot", "\(enabled)")
+        DeviceLog.emit("set_hotspot")
     }
     public func setDoNotDisturb(enabled: Bool) async throws {
-        DeviceLog.emit("set_do_not_disturb", "\(enabled)")
+        DeviceLog.emit("set_do_not_disturb")
     }
     public func setFocusMode(mode: FocusMode) async throws {
-        DeviceLog.emit("set_focus_mode", "\(mode)")
+        DeviceLog.emit("set_focus_mode")
     }
     public func setBrightness(level: Int) async throws {
-        DeviceLog.emit("set_brightness", "\(level)")
+        DeviceLog.emit("set_brightness")
     }
     public func setDarkMode(enabled: Bool) async throws {
-        DeviceLog.emit("set_dark_mode", "\(enabled)")
+        DeviceLog.emit("set_dark_mode")
     }
     public func setAutoLock(minutes: Int) async throws {
-        DeviceLog.emit("set_auto_lock", "\(minutes)")
+        DeviceLog.emit("set_auto_lock")
     }
     public func setOrientationLock(enabled: Bool) async throws {
-        DeviceLog.emit("set_orientation_lock", "\(enabled)")
+        DeviceLog.emit("set_orientation_lock")
     }
     public func setWallpaper(name: String) async throws {
-        DeviceLog.emit("set_wallpaper", "\(name)")
+        DeviceLog.emit("set_wallpaper")
     }
     public func takeScreenshot() async throws {
-        DeviceLog.emit("take_screenshot", "")
+        DeviceLog.emit("take_screenshot")
     }
     public func setVolume(level: Int) async throws {
-        DeviceLog.emit("set_volume", "\(level)")
+        DeviceLog.emit("set_volume")
     }
     public func setMute(enabled: Bool) async throws {
-        DeviceLog.emit("set_mute", "\(enabled)")
+        DeviceLog.emit("set_mute")
     }
     public func setRingerMode(mode: RingerMode) async throws {
-        DeviceLog.emit("set_ringer_mode", "\(mode)")
+        DeviceLog.emit("set_ringer_mode")
     }
     public func setLowPowerMode(enabled: Bool) async throws {
-        DeviceLog.emit("set_low_power_mode", "\(enabled)")
+        DeviceLog.emit("set_low_power_mode")
     }
     public func restartDevice() async throws {
-        DeviceLog.emit("restart_device", "")
+        DeviceLog.emit("restart_device")
     }
     public func shutdownDevice() async throws {
-        DeviceLog.emit("shutdown_device", "")
+        DeviceLog.emit("shutdown_device")
     }
     public func setAlarm(time: String, label: String?) async throws {
-        DeviceLog.emit("set_alarm", "\(time), \(label)")
+        DeviceLog.emit("set_alarm")
     }
     public func startTimer(minutes: Int, label: String?) async throws {
-        DeviceLog.emit("start_timer", "\(minutes), \(label)")
+        DeviceLog.emit("start_timer")
     }
     public func cancelTimers() async throws {
-        DeviceLog.emit("cancel_timers", "")
+        DeviceLog.emit("cancel_timers")
     }
     public func createReminder(text: String, time: String?) async throws {
-        DeviceLog.emit("create_reminder", "\(text), \(time)")
+        DeviceLog.emit("create_reminder")
     }
     public func listReminders() async throws {
-        DeviceLog.emit("list_reminders", "")
+        DeviceLog.emit("list_reminders")
     }
     public func createCalendarEvent(title: String, start: String, end: String?) async throws {
-        DeviceLog.emit("create_calendar_event", "\(title), \(start), \(end)")
+        DeviceLog.emit("create_calendar_event")
     }
     public func listCalendarEvents(day: String?) async throws {
-        DeviceLog.emit("list_calendar_events", "\(day)")
+        DeviceLog.emit("list_calendar_events")
     }
     public func sendMessage(to: String, body: String) async throws {
-        DeviceLog.emit("send_message", "\(to), \(body)")
+        DeviceLog.emit("send_message")
     }
     public func composeMail(to: String, subject: String?, body: String) async throws {
-        DeviceLog.emit("compose_mail", "\(to), \(subject), \(body)")
+        DeviceLog.emit("compose_mail")
     }
     public func startCall(to: String) async throws {
-        DeviceLog.emit("start_call", "\(to)")
+        DeviceLog.emit("start_call")
     }
     public func openApp(name: String) async throws {
-        DeviceLog.emit("open_app", "\(name)")
+        DeviceLog.emit("open_app")
     }
     public func closeApp(name: String) async throws {
-        DeviceLog.emit("close_app", "\(name)")
+        DeviceLog.emit("close_app")
     }
     public func mediaControl(action: MediaAction) async throws {
-        DeviceLog.emit("media_control", "\(action)")
+        DeviceLog.emit("media_control")
     }
     public func playMusic(query: String?) async throws {
-        DeviceLog.emit("play_music", "\(query)")
+        DeviceLog.emit("play_music")
     }
     public func setFlashlight(enabled: Bool) async throws {
-        DeviceLog.emit("set_flashlight", "\(enabled)")
+        DeviceLog.emit("set_flashlight")
     }
     public func setClipboard(text: String) async throws {
-        DeviceLog.emit("set_clipboard", "\(text)")
+        DeviceLog.emit("set_clipboard")
     }
     public func setLocationServices(enabled: Bool) async throws {
-        DeviceLog.emit("set_location_services", "\(enabled)")
+        DeviceLog.emit("set_location_services")
     }
     public func getBattery() async throws -> String {
-        DeviceLog.emit("get_battery", "")
+        DeviceLog.emit("get_battery")
         return "[stub] get_battery"
     }
     public func getStorage() async throws -> String {
-        DeviceLog.emit("get_storage", "")
+        DeviceLog.emit("get_storage")
         return "[stub] get_storage"
     }
     public func getConnectivityStatus() async throws -> String {
-        DeviceLog.emit("get_connectivity_status", "")
+        DeviceLog.emit("get_connectivity_status")
         return "[stub] get_connectivity_status"
     }
     public func searchNotes(query: String) async throws -> String {
-        DeviceLog.emit("search_notes", "\(query)")
+        DeviceLog.emit("search_notes")
         return "[stub] search_notes"
     }
 }
 
-public enum DeviceLog { public static func emit(_ cmd: String, _ args: String) {
-    print("[DeviceControl] \(cmd) \(args)") } }
+public enum DeviceLog { public static func emit(_ cmd: String) {
+    print("[DeviceControl] \(cmd)") } }

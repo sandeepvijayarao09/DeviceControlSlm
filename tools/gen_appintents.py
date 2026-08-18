@@ -147,8 +147,11 @@ def gen():
                     conv.append(f'{p}: {en}(rawValue: args["{p}"] ?? "") ?? .{s["enum"][0]}')
                 else:
                     conv.append(f'{p}: args["{p}"].flatMap {{ {en}(rawValue: $0) }}')
-            else:
-                conv.append(f'{p}: args["{p}"]' + ("" if p in req else ""))
+            else:  # string
+                if p in req:
+                    conv.append(f'{p}: args["{p}"] ?? ""')   # required -> non-optional String
+                else:
+                    conv.append(f'{p}: args["{p}"]')          # optional -> String?
         argstr = ", ".join(conv)
         if t["domain"] == "query":
             L.append(f'        case "{name}": return try await c.{camel(name)}({argstr})')
@@ -178,17 +181,16 @@ def gen():
         props = t["parameters"].get("properties", {})
         req = set(t["parameters"].get("required", []))
         params = ", ".join(f"{p}: {swift_type(name, p, s, p in req)}" for p, s in props.items())
-        argnames = ", ".join(f"\\({p})" for p in props)
         ret = " -> String" if t["domain"] == "query" else ""
         S.append(f"    public func {camel(name)}({params}) async throws{ret} {{")
-        S.append(f'        DeviceLog.emit("{name}", "{argnames}")')
+        S.append(f'        DeviceLog.emit("{name}")')
         if t["domain"] == "query":
             S.append(f'        return "[stub] {name}"')
         S.append("    }")
     S.append("}")
     S.append("")
-    S.append("public enum DeviceLog { public static func emit(_ cmd: String, _ args: String) {")
-    S.append('    print("[DeviceControl] \\(cmd) \\(args)") } }')
+    S.append("public enum DeviceLog { public static func emit(_ cmd: String) {")
+    S.append('    print("[DeviceControl] \\(cmd)") } }')
     stub_out = OUT.parent / "StubDeviceController.swift"
     stub_out.write_text("\n".join(S) + "\n", encoding="utf-8")
     print(f"wrote {stub_out.relative_to(ROOT)}")

@@ -540,7 +540,7 @@ public enum CommandRouter {
         case "set_dark_mode": try await c.setDarkMode(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_dark_mode ok"
         case "set_auto_lock": try await c.setAutoLock(minutes: Int(args["minutes"] ?? "") ?? 0); return "set_auto_lock ok"
         case "set_orientation_lock": try await c.setOrientationLock(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_orientation_lock ok"
-        case "set_wallpaper": try await c.setWallpaper(name: args["name"]); return "set_wallpaper ok"
+        case "set_wallpaper": try await c.setWallpaper(name: args["name"] ?? ""); return "set_wallpaper ok"
         case "take_screenshot": try await c.takeScreenshot(); return "take_screenshot ok"
         case "set_volume": try await c.setVolume(level: Int(args["level"] ?? "") ?? 0); return "set_volume ok"
         case "set_mute": try await c.setMute(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_mute ok"
@@ -548,27 +548,27 @@ public enum CommandRouter {
         case "set_low_power_mode": try await c.setLowPowerMode(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_low_power_mode ok"
         case "restart_device": try await c.restartDevice(); return "restart_device ok"
         case "shutdown_device": try await c.shutdownDevice(); return "shutdown_device ok"
-        case "set_alarm": try await c.setAlarm(time: args["time"], label: args["label"]); return "set_alarm ok"
+        case "set_alarm": try await c.setAlarm(time: args["time"] ?? "", label: args["label"]); return "set_alarm ok"
         case "start_timer": try await c.startTimer(minutes: Int(args["minutes"] ?? "") ?? 0, label: args["label"]); return "start_timer ok"
         case "cancel_timers": try await c.cancelTimers(); return "cancel_timers ok"
-        case "create_reminder": try await c.createReminder(text: args["text"], time: args["time"]); return "create_reminder ok"
+        case "create_reminder": try await c.createReminder(text: args["text"] ?? "", time: args["time"]); return "create_reminder ok"
         case "list_reminders": try await c.listReminders(); return "list_reminders ok"
-        case "create_calendar_event": try await c.createCalendarEvent(title: args["title"], start: args["start"], end: args["end"]); return "create_calendar_event ok"
+        case "create_calendar_event": try await c.createCalendarEvent(title: args["title"] ?? "", start: args["start"] ?? "", end: args["end"]); return "create_calendar_event ok"
         case "list_calendar_events": try await c.listCalendarEvents(day: args["day"]); return "list_calendar_events ok"
-        case "send_message": try await c.sendMessage(to: args["to"], body: args["body"]); return "send_message ok"
-        case "compose_mail": try await c.composeMail(to: args["to"], subject: args["subject"], body: args["body"]); return "compose_mail ok"
-        case "start_call": try await c.startCall(to: args["to"]); return "start_call ok"
-        case "open_app": try await c.openApp(name: args["name"]); return "open_app ok"
-        case "close_app": try await c.closeApp(name: args["name"]); return "close_app ok"
+        case "send_message": try await c.sendMessage(to: args["to"] ?? "", body: args["body"] ?? ""); return "send_message ok"
+        case "compose_mail": try await c.composeMail(to: args["to"] ?? "", subject: args["subject"], body: args["body"] ?? ""); return "compose_mail ok"
+        case "start_call": try await c.startCall(to: args["to"] ?? ""); return "start_call ok"
+        case "open_app": try await c.openApp(name: args["name"] ?? ""); return "open_app ok"
+        case "close_app": try await c.closeApp(name: args["name"] ?? ""); return "close_app ok"
         case "media_control": try await c.mediaControl(action: MediaAction(rawValue: args["action"] ?? "") ?? .play); return "media_control ok"
         case "play_music": try await c.playMusic(query: args["query"]); return "play_music ok"
         case "set_flashlight": try await c.setFlashlight(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_flashlight ok"
-        case "set_clipboard": try await c.setClipboard(text: args["text"]); return "set_clipboard ok"
+        case "set_clipboard": try await c.setClipboard(text: args["text"] ?? ""); return "set_clipboard ok"
         case "set_location_services": try await c.setLocationServices(enabled: (args["enabled"].map { $0 == "true" } ?? false)); return "set_location_services ok"
         case "get_battery": return try await c.getBattery()
         case "get_storage": return try await c.getStorage()
         case "get_connectivity_status": return try await c.getConnectivityStatus()
-        case "search_notes": return try await c.searchNotes(query: args["query"])
+        case "search_notes": return try await c.searchNotes(query: args["query"] ?? "")
         default: throw DeviceControlError.unknownCommand(tool)
         }
     }
