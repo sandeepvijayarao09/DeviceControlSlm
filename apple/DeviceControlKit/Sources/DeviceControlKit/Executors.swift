@@ -36,7 +36,8 @@ public struct ShortcutsExecutor: MechanismExecutor {
         // TODO(device): invoke the system App Intent / run the Shortcuts action
         // `action` with `cmd.args` (e.g. via AppIntent.perform() or an
         // x-callback `shortcuts://run-shortcut`). Stubbed to log for now.
-        DeviceLog.emit("shortcut:\(action)", cmd.args.map { "\($0)=\($1)" }.joined(separator: " "))
+        let argstr = cmd.args.map { "\($0)=\($1)" }.joined(separator: " ")
+        DeviceLog.emit("shortcut:\(action) \(cmd.tool) \(argstr)")
     }
 }
 
@@ -47,7 +48,7 @@ public struct AccessibilityExecutor: MechanismExecutor {
     public func run(_ cmd: DeviceCommand) async throws {
         // TODO(device, macOS): use AXUIElement to open the relevant Settings pane
         // and toggle the control. Requires the Accessibility permission. Stubbed.
-        DeviceLog.emit("accessibility", cmd.tool)
+        DeviceLog.emit("accessibility:\(cmd.tool)")
     }
 }
 
