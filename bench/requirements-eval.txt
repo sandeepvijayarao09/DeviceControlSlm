@@ -1,0 +1,10 @@
+# Portable *quality* evaluation (CPU/GPU, any OS). The benchmark core + metrics
+# + stats are stdlib-only; these are only needed to run real models via the HF
+# backend. Pin exact versions in requirements.lock when freezing a paper run.
+transformers>=4.44
+torch>=2.2          # CPU wheels: pip install torch --index-url https://download.pytorch.org/whl/cpu
+accelerate>=0.30
+huggingface_hub>=0.24
+
+# Apple-Silicon efficiency eval (Mac only):
+#   pip install "mlx-lm>=0.19"

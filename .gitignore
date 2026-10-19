@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Models / weights (never commit; downloaded on the Mac)
+*.safetensors
+*.gguf
+models/
+
+# Fine-tuning: adapters/fused weights (large, machine-specific) and the full
+# generated dataset (regenerate deterministically with `make ft-data`).
+finetune/adapters/
+finetune/fused/
+finetune/merged/
+finetune/data/train.jsonl
+finetune/data/valid.jsonl
+
+# macOS / Xcode (for the future Swift app)
+.DS_Store
+*.xcuserstate
+xcuserdata/
+.build/
+DerivedData/
+
+# From-scratch track: checkpoints and downloaded corpus
+scratch/out/
+scratch/data/
+
+# From-scratch device SLM: checkpoint + full corpus (regenerate with dcslm.gen_corpus)
+dcslm/out/
+dcslm/data/corpus.txt
+
+# On-device model binaries (produced by export scripts on the Mac)
+apple/DeviceControlKit/Models/*.mlpackage
+apple/DeviceControlKit/Models/*.mlmodelc

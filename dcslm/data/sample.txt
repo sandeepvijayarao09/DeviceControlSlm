@@ -1,0 +1,30 @@
+Please fire up low power mode and capture the screen now.set_low_power_mode|enabled=true ; take_screenshot
+Let's delete the operating system right now.REFUSE
+Go ahead and switch to ring, then switch to work focus for meset_ringer_mode|mode=ring ; set_focus_mode|mode=work
+let's volume to 5, also grab a screenshotset_volume|level=5 ; take_screenshot
+Mind screenshot nowtake_screenshot
+go ahead and remind me to water the plants, then set alarm 9am alreadycreate_reminder|text=water the plants ; set_alarm|time=09:00
+Start a 60 minute timer, also set alarm 2pm, also i want mute off if you canstart_timer|minutes=60 ; set_alarm|time=14:00 ; set_mute|enabled=false
+Could you 10 minute timer and capture the screen right nowstart_timer|minutes=10 ; take_screenshot
+Switch off low power, then make the brightness 0% now.set_low_power_mode|enabled=false ; set_brightness|level=0
+Going to sleep nowset_focus_mode|mode=sleep
+I'd like you to how much storage is left real quick!get_storage
+Would you stop the music, then make the brightness 5%.media_control|action=stop ; set_brightness|level=5
+let's switch to vibrate and then set a 1 min timer thanksset_ringer_mode|mode=vibrate ; start_timer|minutes=1
+Orientation lock off real quick.set_orientation_lock|enabled=false
+Switch to ring, also alarm at 1am, also bluetooth on thanks.set_ringer_mode|mode=ring ; set_alarm|time=01:00 ; set_bluetooth|enabled=true
+Please translate this page real quickREFUSE
+Battery saver off and 1 minute timerset_low_power_mode|enabled=false ; start_timer|minutes=1
+Would you set a reminder to buy milk at 12am, then wake me at 7 am, then i want dark mode offcreate_reminder|text=buy milk|time=00:00 ; set_alarm|time=07:00 ; set_dark_mode|enabled=false
+Let's previous song and then remind me to water the plants at 7:00pm thanksmedia_control|action=previous ; create_reminder|text=water the plants|time=19:00
+Would you change the brightness to 90 percent and set the ringer to silent real quickset_brightness|level=90 ; set_ringer_mode|mode=silent
+Set a timer for 15 minutes already.start_timer|minutes=15
+could you set a 90 min timer, then change the brightness to 100 percent if you canstart_timer|minutes=90 ; set_brightness|level=100
+Work focus, and open Chrome, and put the volume at 10 for meset_focus_mode|mode=work ; open_app|name=chrome ; set_volume|level=10
+Would you put the volume at 0 for meset_volume|level=0
+Getting in the car nowset_focus_mode|mode=driving
+Summarize this pdf if you can!REFUSE
+I'd like you to set the ringer to vibrate, and set brightness 50%, and bring up dark theme thanks.set_ringer_mode|mode=vibrate ; set_brightness|level=50 ; set_dark_mode|enabled=true
+would you screenshot!take_screenshot
+Hey, set a reminder to pick up the kids at 11pm if you cancreate_reminder|text=pick up the kids|time=23:00
+Can you timer for 2 min thanksstart_timer|minutes=2
