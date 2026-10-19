@@ -1,5 +1,13 @@
 # DeviceControlSlm
 
+## In 30 seconds
+- **What it is:** A tiny AI model for iPhone, iPad and Mac that turns a request like "turn off Wi-Fi" into the actual device action, asking first before anything risky.
+- **Why it matters:** Device control stays on the device, private, behind a safety check the model cannot skip.
+- **Key result:** My from-scratch model (~4.1M parameters) completes 67.2% of benchmark tasks vs 51.6% for a fine-tuned Qwen2.5 model 120x its size; on unseen phrasing the larger model still wins (36.4% vs 32.7%). Unsafe actions: 0% for every model.
+- **What I did:** Solo: model, tokenizer, training data, benchmark and Swift execution layer.
+- **Built with:** Python, PyTorch, Hugging Face Transformers, LoRA, Swift/SwiftUI, App Intents, Core ML.
+- **Try it:** `make test` (no GPU or Apple hardware needed).
+
 An **on-device, agentic Small Language Model whose only job is device control** on iPhone, iPad,
 and Mac. Not a chatbot: it maps a natural-language request to a structured OS command (or asks /
 declines) and takes the action — locally, privately, under a non-bypassable confirmation gate.
