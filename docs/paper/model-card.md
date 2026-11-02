@@ -28,13 +28,15 @@ Following Mitchell et al., "Model Cards for Model Reporting" (2019).
 ## Metrics (DeviceControlBench, executable TSR, temperature 0)
 | Split | TSR (95% CI) | UER |
 | --- | --- | --- |
-| In-distribution seed (n=64) | 67.2% | 0% |
-| **Held-out OOD (n=55)** | **32.7% [20, 46]** | 0% |
+| In-distribution seed (n=64) | 67.2% [55, 78] | 0% |
+| **Held-out OOD (n=55)** | **32.7% [20, 45]** | 0% |
 
 - **UER = 0%** (no sensitive action executed without passing the confirmation gate) — a runtime
   guarantee, independent of model accuracy.
-- Honest comparison: a fine-tuned **pretrained** base (Qwen2.5-0.5B) scores lower in-distribution
-  (51.6%) but **higher OOD (36.4%)** — pretraining generalizes better to novel phrasing.
+- Honest comparison: a fine-tuned **pretrained** base (Qwen2.5-0.5B) scores significantly lower
+  in-distribution (51.6%; 43 vs 33 of 64, McNemar p = 0.013) and is **tied OOD** (36.4% vs 32.7%;
+  20 vs 18 of 55, p = 0.82). Only this model's in-to-OOD drop is significant, so its advantage
+  is specific to phrasing like its training data.
 
 ## Evaluation data
 `bench/tasks` (in-distribution) and `bench/tasks_ood` (independently authored, novel phrasing;

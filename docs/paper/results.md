@@ -53,8 +53,8 @@ knowledge) will drop more there than a pretrained base would. `read_query` stays
 (the model picks the query tool but can't know the value; the runtime must fill it).
 
 > **Update (see RQ6):** the held-out OOD test confirmed exactly this caveat. This 75% is an
-> in-distribution number; on novel phrasing the from-scratch model drops to ~33% and the
-> fine-tuned pretrained base overtakes it. Read RQ5 together with RQ6.
+> in-distribution number; on novel phrasing the from-scratch model drops to ~33% and its lead over the
+> fine-tuned pretrained base disappears (a statistical tie). Read RQ5 together with RQ6.
 
 ## Held-out OOD test (RQ6) — the result that reframes everything
 Evaluating on `bench/tasks_ood` (independently authored, novel phrasing, verified 0 leakage):
@@ -68,12 +68,21 @@ Held-out set `bench/tasks_ood` (independently authored, novel verbs + indirect i
 | DCSLM (from scratch) | ~4.1M | 67.2% | **32.7%** [20, 46] | −34 |
 | Qwen-0.5B base | 494M | 29.7% | **27.3%** | −2 |
 
+Paired tests on the same tasks (exact McNemar, `bench/stats.py`), DCSLM vs fine-tuned Qwen-0.5B:
+in-distribution 43 vs 33 of 64 (only-DCSLM 12, only-Qwen 2, **p = 0.013**); held-out 18 vs 20 of
+55 (only-DCSLM 9, only-Qwen 11, **p = 0.82**). Each model's drop from in-distribution to held-out
+(Fisher exact): DCSLM 43/64 to 18/55, **p = 0.0002**; Qwen-ft 33/64 to 20/55, p = 0.14; Qwen base
+19/64 to 15/55, p = 0.84. DCSLM's drop minus Qwen-ft's drop: +19 points, bootstrap 95% CI
+[−6, +44].
+
 **Reading this honestly:**
-- **The ranking flips out-of-distribution.** In-distribution the from-scratch model dominates
-  (67%); on held-out phrasing the **fine-tuned pretrained base leads** (36.4% vs 32.7%).
-- **Generalization drop scales inversely with pretraining:** from-scratch −34, fine-tuned base
-  −15, base −2. The more a model leans on our training phrasing, the more it loses on novel
-  phrasing; the base's broad language prior transfers almost unchanged.
+- **The in-distribution lead disappears out-of-distribution.** In-distribution the from-scratch
+  model is significantly better (67% vs 52%); on held-out phrasing the two are **statistically
+  tied** (32.7% vs 36.4%). An earlier version of this page said the fine-tuned base "leads" or
+  "overtakes" here; at n=55 that difference is noise.
+- **Only the from-scratch model's drop is clearly real** (−34, p = 0.0002). The fine-tuned base
+  (−15) and base (−2) drops are not significant, and the ordering of the drops is suggestive, not
+  established. Pretraining is the most plausible source of robustness, but this set cannot prove it.
 - **Diversification helped but didn't close the gap.** Tripling phrasing diversity + adding
   indirect intents (P1/P2) traded in-distribution (75%→67%) for only a few OOD points — evidence
   that data diversity alone can't substitute for pretraining's language understanding.
@@ -81,8 +90,8 @@ Held-out set `bench/tasks_ood` (independently authored, novel verbs + indirect i
   open base**. Keep the from-scratch model as the tiny/fast/ownable option, but it needs
   distillation or far more data to generalize.
 
-**Statistical caveat:** at n=55 the three OOD scores (36.4 / 32.7 / 27.3) still have overlapping
-CIs — not definitively separated. The robust, repeatable claim is the *direction* of the drops.
+**Statistical caveat:** at n=55 the three OOD scores (36.4 / 32.7 / 27.3) are not separated by
+any paired test. The robust claims are the in-distribution win and the from-scratch model's drop.
 A larger, **human-authored** OOD set is the next rigor step.
 
 ## Cross-base generalization (RQ4, cont.) — the recipe isn't Qwen-specific

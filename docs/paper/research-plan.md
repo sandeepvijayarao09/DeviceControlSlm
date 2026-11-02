@@ -140,11 +140,12 @@ under CC BY 4.0; datasheet + ethics statement (no real PII — synthetic contact
   reproduces on a second base (SmolLM2), so the gain is the method, not one base.
 - **RQ5 (from scratch):** a purpose-built ~4M model tops the in-distribution leaderboard —
   narrow task ⇒ tiny model viable.
-- **RQ6 (generalization, the key result):** on a held-out OOD split the ranking **flips** —
-  the fine-tuned *pretrained* base (36.4%) beats the from-scratch model (32.7%); drop scales
-  inversely with pretraining (−15 vs −34 vs −2). **Robust generalization comes from
-  pretraining**, so the shipped product should specialize an open base; the from-scratch model
-  is the tiny/ownable option pending more data or distillation.
+- **RQ6 (generalization, the key result):** on a held-out OOD split the from-scratch model's
+  in-distribution lead **disappears**: fine-tuned *pretrained* base 36.4% vs from-scratch 32.7%,
+  a statistical tie (20 vs 18 of 55, McNemar p = 0.82). Only the from-scratch drop is
+  significant (−34, p = 0.0002; fine-tuned −15, p = 0.14; base −2, p = 0.84). Pretraining is
+  the likely source of robustness, so the shipped product should specialize an open base; the
+  from-scratch model is the tiny/ownable option pending more data or distillation.
 
 **Threats to validity (current):** small OOD set (n=55, overlapping CIs — directions are the
 robust claim); single training seed (variance bars pending); OOD authored by us (human-authored

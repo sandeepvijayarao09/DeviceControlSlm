@@ -3,7 +3,7 @@
 ## In 30 seconds
 - **What it is:** A tiny AI model for iPhone, iPad and Mac that turns a request like "turn off Wi-Fi" into the actual device action, asking first before anything risky.
 - **Why it matters:** Device control stays on the device, private, behind a safety check the model cannot skip.
-- **Key result:** My from-scratch model (~4.1M parameters) completes 67.2% of benchmark tasks vs 51.6% for a fine-tuned Qwen2.5 model 120x its size; on unseen phrasing the larger model still wins (36.4% vs 32.7%). Unsafe actions: 0% for every model.
+- **Key result:** On familiar phrasing, my from-scratch model (~4.1M parameters) beats a fine-tuned Qwen2.5 model 120x its size: 67.2% vs 51.6% of tasks (43 vs 33 of 64, McNemar p = 0.013). On new phrasing that lead disappears: 32.7% vs 36.4% (18 vs 20 of 55, p = 0.82), a statistical tie. Unsafe actions: 0% for every model.
 - **What I did:** Solo: model, tokenizer, training data, benchmark and Swift execution layer.
 - **Built with:** Python, PyTorch, Hugging Face Transformers, LoRA, Swift/SwiftUI, App Intents, Core ML.
 - **Try it:** `make test` (no GPU or Apple hardware needed).
@@ -19,16 +19,26 @@ SmolLM2), specialized with LoRA, are kept as honest baselines.
 
 ## Key results (DeviceControlBench, executable success, temperature 0)
 
-| Model | Params | In-distribution | **Held-out OOD (n=55)** | UER |
+| Model | Params | In-distribution (n=64) | Held-out phrasing (n=55) | UER |
 | --- | --- | --- | --- | --- |
-| DCSLM (from scratch) | ~4.1M | **67.2%** | 32.7% [20, 46] | 0% |
-| Qwen2.5-0.5B fine-tuned | 494M | 51.6% | **36.4%** [24, 49] | 0% |
-| Qwen2.5-0.5B base | 494M | 29.7% | 27.3% | 0% |
+| DCSLM (from scratch) | ~4.1M | **67.2%** [55, 78] | 32.7% [20, 45] | 0% |
+| Qwen2.5-0.5B fine-tuned | 494M | 51.6% [39, 64] | 36.4% [24, 49] | 0% |
+| Qwen2.5-0.5B base | 494M | 29.7% [19, 41] | 27.3% [16, 40] | 0% |
 
-**The honest headline:** a tiny from-scratch model *dominates in-distribution* but generalizes
-worst to novel phrasing — on held-out phrasing the fine-tuned **pretrained** base overtakes it.
-Robust capability comes from pretraining. The **confirmation gate holds regardless** (unsafe-
-execution rate = 0% for every model). Full analysis: [`docs/paper/results.md`](docs/paper/results.md).
+Paired comparisons, DCSLM vs fine-tuned Qwen on the same tasks (exact McNemar):
+
+| Split | DCSLM | Qwen-ft | Only DCSLM solved / only Qwen solved | p | Reading |
+| --- | --- | --- | --- | --- | --- |
+| In-distribution | 43 / 64 | 33 / 64 | 12 / 2 | 0.013 | DCSLM better |
+| Held-out phrasing | 18 / 55 | 20 / 55 | 9 / 11 | 0.82 | tie |
+
+**The honest headline:** the tiny from-scratch model *beats* the fine-tuned 120x-larger model on
+phrasing like its training data, and that lead *disappears* on new phrasing, where the two are
+statistically tied. DCSLM's own drop is real (67% to 33%, Fisher p < 0.001); the fine-tuned
+Qwen's drop is not significant at this size (52% to 36%, p = 0.14), and the gap between the two
+drops is not significant either. So pretraining *looks* like the source of robustness, but n=55
+cannot confirm it. The **confirmation gate holds regardless** (unsafe-execution rate = 0% for
+every model). Full analysis: [`docs/paper/results.md`](docs/paper/results.md).
 
 ## Repository
 
@@ -86,6 +96,6 @@ split**, a **contamination gate**, determinism + run manifests, and **CI on ever
 | [`model-card.md`](docs/paper/model-card.md) · [`provenance.md`](docs/paper/provenance.md) | Model card; what's from scratch. |
 
 ## Honest limitations
-- OOD generalization gap (from-scratch model); small held-out set (n=55) → OOD numbers are
-  directional. `read_query` = 0% by design. English-only. On-device execution controllers and
+- OOD generalization gap (from-scratch model); small held-out set (n=55): the held-out
+  comparison is a tie, and the difference between the models' drops is not significant. `read_query` = 0% by design. English-only. On-device execution controllers and
   Core ML export are validated by structure/CI but finalized on a Mac (they need Apple SDKs).
