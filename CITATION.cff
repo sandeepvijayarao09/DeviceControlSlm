@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "DeviceControlSlm: an on-device small language model for device control"
+authors:
+  - family-names: "Vijayarao"
+    given-names: "Sai Sandeep Kumar"
+repository-code: "https://github.com/sandeepvijayarao09/DeviceControlSlm"
+url: "https://github.com/sandeepvijayarao09/DeviceControlSlm"
+version: "1.0.0"
+date-released: "2026-11-09"
+license: MIT

@@ -34,12 +34,19 @@ device-control DSL — **~4.1M params, ~120× smaller than the 0.5B** — tops t
 
 | Model | Params | TSR (95% CI) | UER | speed |
 | --- | --- | --- | --- | --- |
-| **DCSLM (from scratch, device-only)** | **~4.1M** | **75.0% [64%, 86%]** | 0% | ~0.1s/task |
-| Qwen2.5-0.5B — fine-tuned | 494M | 51.6% [39%, 64%] | 0% | ~12s/task |
-| Qwen2.5-1.5B — base | 1.5B | 45.3% [33%, 58%] | 0% | — |
+| **DCSLM (from scratch, device-only)** | **~4.1M** | **67.2% [55%, 78%]** (43/64) | 0% | ~0.13 s/task |
+| Qwen2.5-0.5B — fine-tuned | 494M | 51.6% [39%, 64%] (33/64) | 0% | ~7.4 s/task |
+| Qwen2.5-1.5B — base | 1.5B | 45.3% [33%, 58%] (29/64) | 0% | — |
 
-Per category: single_tool 100%, clarify 100%, refusal 100%, compositional 70%, safety 70%,
-read_query 0%. FVR 95%, CGR 70%.
+Per category (DCSLM): single_tool 100%, clarify 100%, refusal 90%, compositional 50%, safety 50%,
+read_query 0%. FVR 96.9%, CGR 50%. DCSLM vs fine-tuned Qwen on the same 64 tasks: exact McNemar
+p = 0.013 (only-DCSLM 12, only-Qwen 2). Speed is wall-clock per task from the run manifests (CPU).
+Source: `results/dcslm__out__ckpt.pt/scratch_scratch/run.json`,
+`results/finetune__merged__qwen0.5b-ft/hf_ft/run.json`, `results/leaderboard.md`.
+
+> **Correction:** an earlier version of this table reported DCSLM at 75.0% [64%, 86%]. It appears to come
+> from the earlier, pre-diversification checkpoint (see RQ6), but no committed run backs it. The numbers above
+> are the committed 64-task run, which matches the README table.
 
 **Interpretation — and the honest caveat.** This validates the core thesis: when the task is
 *only* device control, a tiny purpose-built model beats general models 100–350× its size, at a
@@ -52,7 +59,7 @@ measure robustness to genuinely novel user phrasings. The needed next rigor step
 knowledge) will drop more there than a pretrained base would. `read_query` stays 0% by design
 (the model picks the query tool but can't know the value; the runtime must fill it).
 
-> **Update (see RQ6):** the held-out OOD test confirmed exactly this caveat. This 75% is an
+> **Update (see RQ6):** the held-out OOD test confirmed exactly this caveat. This 67.2% is an
 > in-distribution number; on novel phrasing the from-scratch model drops to ~33% and its lead over the
 > fine-tuned pretrained base disappears (a statistical tie). Read RQ5 together with RQ6.
 
@@ -65,7 +72,7 @@ Held-out set `bench/tasks_ood` (independently authored, novel verbs + indirect i
 | Model | Params | In-distribution TSR | **Held-out OOD-55 TSR** | Δ |
 | --- | --- | --- | --- | --- |
 | Qwen-0.5B **fine-tuned** | 494M | 51.6% | **36.4%** [24, 49] | −15 |
-| DCSLM (from scratch) | ~4.1M | 67.2% | **32.7%** [20, 46] | −34 |
+| DCSLM (from scratch) | ~4.1M | 67.2% | **32.7%** [20, 45] | −34 |
 | Qwen-0.5B base | 494M | 29.7% | **27.3%** | −2 |
 
 Paired tests on the same tasks (exact McNemar, `bench/stats.py`), DCSLM vs fine-tuned Qwen-0.5B:
@@ -84,7 +91,8 @@ in-distribution 43 vs 33 of 64 (only-DCSLM 12, only-Qwen 2, **p = 0.013**); held
   (−15) and base (−2) drops are not significant, and the ordering of the drops is suggestive, not
   established. Pretraining is the most plausible source of robustness, but this set cannot prove it.
 - **Diversification helped but didn't close the gap.** Tripling phrasing diversity + adding
-  indirect intents (P1/P2) traded in-distribution (75%→67%) for only a few OOD points — evidence
+  indirect intents (P1/P2) cost some in-distribution accuracy (an earlier, uncommitted run scored
+  about 75%; the committed run is 67.2%) for only a few OOD points — evidence
   that data diversity alone can't substitute for pretraining's language understanding.
 - **Product implication:** for robustness to how people actually phrase things, **specialize an
   open base**. Keep the from-scratch model as the tiny/fast/ownable option, but it needs
