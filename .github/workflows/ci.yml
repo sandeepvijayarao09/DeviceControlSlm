@@ -38,7 +38,7 @@ jobs:
 
   swift-package:
     name: DeviceControlKit (macOS)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Verify generated App Intents are in sync with the catalog
